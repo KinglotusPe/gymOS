@@ -183,10 +183,14 @@ CREATE TABLE producto (
     categoria_id BIGINT NOT NULL,
     codigo_barra VARCHAR(50) NULL UNIQUE,
     nombre VARCHAR(120) NOT NULL,
+    descripcion VARCHAR(255) NULL,
+    precio_unitario NUMERIC(10, 2) NOT NULL DEFAULT 0,
     precio_compra NUMERIC(10, 2) NOT NULL,
     precio_venta NUMERIC(10, 2) NOT NULL,
+    stock INTEGER NOT NULL DEFAULT 0,
     stock_actual INTEGER NOT NULL DEFAULT 0,
     stock_minimo INTEGER NOT NULL DEFAULT 5,
+    imagen_url VARCHAR(500) NULL,
     CONSTRAINT fk_producto_categoria FOREIGN KEY (categoria_id) REFERENCES categoria_producto(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -197,6 +201,7 @@ CREATE TABLE venta (
     fecha_hora TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     total NUMERIC(10, 2) NOT NULL,
     metodo_pago VARCHAR(30) NOT NULL DEFAULT 'EFECTIVO',
+    comprobante_numero VARCHAR(30) NULL,
     CONSTRAINT fk_venta_cliente FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT fk_venta_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -253,7 +258,12 @@ CREATE TABLE casillero (
     id BIGSERIAL PRIMARY KEY,
     numero VARCHAR(20) NOT NULL UNIQUE,
     ubicacion VARCHAR(100) NOT NULL,
-    estado VARCHAR(30) NOT NULL DEFAULT 'DISPONIBLE'
+    piso INTEGER NOT NULL DEFAULT 1,
+    estado VARCHAR(30) NOT NULL DEFAULT 'DISPONIBLE',
+    ocupado_por_nombre VARCHAR(100) NULL,
+    ocupado_por_dni VARCHAR(20) NULL,
+    ocupado_por_tipo VARCHAR(30) NULL,
+    fecha_ocupacion TIMESTAMP NULL
 );
 
 CREATE TABLE alquiler_casillero (

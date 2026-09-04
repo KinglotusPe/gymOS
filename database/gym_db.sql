@@ -186,10 +186,14 @@ CREATE TABLE producto (
     categoria_id BIGINT NOT NULL,
     codigo_barra VARCHAR(50) NULL UNIQUE,
     nombre VARCHAR(120) NOT NULL,
+    descripcion VARCHAR(255) NULL,
+    precio_unitario DECIMAL(10, 2) NOT NULL DEFAULT 0,
     precio_compra DECIMAL(10, 2) NOT NULL,
     precio_venta DECIMAL(10, 2) NOT NULL,
+    stock INT NOT NULL DEFAULT 0,
     stock_actual INT NOT NULL DEFAULT 0,
     stock_minimo INT NOT NULL DEFAULT 5,
+    imagen_url VARCHAR(500) NULL,
     CONSTRAINT fk_producto_categoria FOREIGN KEY (categoria_id) REFERENCES categoria_producto(id) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
@@ -200,6 +204,7 @@ CREATE TABLE venta (
     fecha_hora DATETIME NOT NULL,
     total DECIMAL(10, 2) NOT NULL,
     metodo_pago VARCHAR(30) NOT NULL DEFAULT 'EFECTIVO',
+    comprobante_numero VARCHAR(30) NULL,
     CONSTRAINT fk_venta_cliente FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT fk_venta_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB;
@@ -256,7 +261,12 @@ CREATE TABLE casillero (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     numero VARCHAR(20) NOT NULL UNIQUE,
     ubicacion VARCHAR(100) NOT NULL,
-    estado VARCHAR(30) NOT NULL DEFAULT 'DISPONIBLE'
+    piso INT NOT NULL DEFAULT 1,
+    estado VARCHAR(30) NOT NULL DEFAULT 'DISPONIBLE',
+    ocupado_por_nombre VARCHAR(100) NULL,
+    ocupado_por_dni VARCHAR(20) NULL,
+    ocupado_por_tipo VARCHAR(30) NULL,
+    fecha_ocupacion DATETIME NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE alquiler_casillero (
@@ -399,12 +409,25 @@ INSERT INTO reserva_clase (clase_id, cliente_id, fecha_reserva, estado) VALUES
 (1, 2, NOW(), 'CONFIRMADA');
 
 -- Casilleros / Lockers
-INSERT INTO casillero (numero, ubicacion, estado) VALUES
-('L-01', 'Vestidor Varones - Piso 1', 'OCUPADO'),
-('L-02', 'Vestidor Varones - Piso 1', 'DISPONIBLE'),
-('L-03', 'Vestidor Varones - Piso 1', 'DISPONIBLE'),
-('L-04', 'Vestidor Damas - Piso 1', 'DISPONIBLE'),
-('L-05', 'Vestidor Damas - Piso 1', 'OCUPADO');
+INSERT INTO casillero (numero, ubicacion, piso, estado, ocupado_por_nombre, ocupado_por_dni, ocupado_por_tipo, fecha_ocupacion) VALUES
+('L-01', 'Vestidor Varones - Piso 1', 1, 'OCUPADO', 'Juan Carlos Pérez', '72345678', 'SOCIO', NOW()),
+('L-02', 'Vestidor Varones - Piso 1', 1, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-03', 'Vestidor Varones - Piso 1', 1, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-04', 'Vestidor Damas - Piso 1', 1, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-05', 'Vestidor Damas - Piso 1', 1, 'OCUPADO', 'María Elena Gómez', '73456789', 'SOCIO', NOW()),
+('L-06', 'Vestidor Damas - Piso 1', 1, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-07', 'Zona Musculación & Cardio - Piso 2', 2, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-08', 'Zona Musculación & Cardio - Piso 2', 2, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-09', 'Zona Musculación & Cardio - Piso 2', 2, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-10', 'Zona Musculación & Cardio - Piso 2', 2, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-11', 'Zona Musculación & Cardio - Piso 2', 2, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-12', 'Zona Musculación & Cardio - Piso 2', 2, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-13', 'Área Funcional & Spinning - Piso 3', 3, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-14', 'Área Funcional & Spinning - Piso 3', 3, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-15', 'Área Funcional & Spinning - Piso 3', 3, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-16', 'Área Funcional & Spinning - Piso 3', 3, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-17', 'Área Funcional & Spinning - Piso 3', 3, 'DISPONIBLE', NULL, NULL, NULL, NULL),
+('L-18', 'Área Funcional & Spinning - Piso 3', 3, 'DISPONIBLE', NULL, NULL, NULL, NULL);
 
 INSERT INTO alquiler_casillero (casillero_id, cliente_id, fecha_inicio, fecha_fin, costo, estado) VALUES
 (1, 1, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 MONTH), 30.00, 'ACTIVO');
