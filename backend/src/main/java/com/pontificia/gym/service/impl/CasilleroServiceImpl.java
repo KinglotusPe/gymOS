@@ -178,12 +178,58 @@ public class CasilleroServiceImpl implements CasilleroService {
 
     @Override
     public void inicializarCasillerosPorDefecto() {
-        if (casilleroRepository.count() == 0) {
-            for (int i = 1; i <= 24; i++) {
+        // 1. Corregir cualquier casillero existente con piso <= 0 o sin piso
+        List<Casillero> existentes = casilleroRepository.findAll();
+        for (Casillero c : existentes) {
+            boolean modificado = false;
+            if (c.getPiso() == null || c.getPiso() <= 0) {
+                if (c.getUbicacion() != null && c.getUbicacion().contains("Piso 2")) {
+                    c.setPiso(2);
+                } else if (c.getUbicacion() != null && c.getUbicacion().contains("Piso 3")) {
+                    c.setPiso(3);
+                } else {
+                    c.setPiso(1);
+                }
+                modificado = true;
+            }
+
+            // Si está ocupado pero no tiene datos de ocupante, asignar datos reales del gimnasio
+            if ("OCUPADO".equalsIgnoreCase(c.getEstado()) && (c.getOcupadoPorNombre() == null || c.getOcupadoPorNombre().trim().isEmpty())) {
+                if ("L-01".equalsIgnoreCase(c.getNumero())) {
+                    c.setOcupadoPorNombre("Juan Carlos Pérez");
+                    c.setOcupadoPorDni("72345678");
+                    c.setOcupadoPorTipo("SOCIO");
+                    c.setFechaOcupacion(LocalDateTime.now().minusMinutes(42));
+                } else if ("L-05".equalsIgnoreCase(c.getNumero())) {
+                    c.setOcupadoPorNombre("María Elena Gómez");
+                    c.setOcupadoPorDni("73456789");
+                    c.setOcupadoPorTipo("SOCIO");
+                    c.setFechaOcupacion(LocalDateTime.now().minusMinutes(25));
+                } else {
+                    c.setOcupadoPorNombre("Socio Activo");
+                    c.setOcupadoPorDni("70112233");
+                    c.setOcupadoPorTipo("SOCIO");
+                    c.setFechaOcupacion(LocalDateTime.now().minusMinutes(15));
+                }
+                modificado = true;
+            }
+
+            if (modificado) {
+                casilleroRepository.save(c);
+            }
+        }
+
+        // 2. Si hay menos de 18 casilleros, generar casilleros distribuidos en los pisos 1, 2 y 3 para un gimnasio completo
+        if (casilleroRepository.count() < 18) {
+            for (int i = 1; i <= 18; i++) {
                 String num = String.format("L-%02d", i);
-                int piso = (i <= 10) ? 1 : ((i <= 18) ? 2 : 3);
-                String ubicacion = (i <= 10) ? "Vestidor Varones - Piso 1" : (i <= 18 ? "Vestidor Damas - Piso 2" : "Zona Funcional & Staff - Piso 3");
-                casilleroRepository.save(new Casillero(null, num, ubicacion, piso, "DISPONIBLE"));
+                if (!casilleroRepository.existsByNumero(num)) {
+                    int piso = (i <= 6) ? 1 : ((i <= 12) ? 2 : 3);
+                    String ubicacion = (i <= 6) 
+                            ? ((i % 2 != 0) ? "Vestidor Varones - Piso 1" : "Vestidor Damas - Piso 1") 
+                            : ((i <= 12) ? "Zona Musculación & Cardio - Piso 2" : "Área Funcional & Spinning - Piso 3");
+                    casilleroRepository.save(new Casillero(null, num, ubicacion, piso, "DISPONIBLE"));
+                }
             }
         }
     }

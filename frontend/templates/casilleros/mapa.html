@@ -7,29 +7,29 @@
 <div class="container mb-5">
 
     <!-- Encabezado de la Sección -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 mt-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">
                 <i class="bi bi-grid-3x3-gap-fill text-danger me-2"></i> Mapa de Casilleros y Lockers en Vivo
             </h1>
             <p class="text-muted mb-0 small">
-                Monitoreo en tiempo real de ocupación y liberación automática al escanear QR / DNI en el molinete.
+                Monitoreo en tiempo real de ocupación de casilleros, quién los usa y liberación automática al escanear QR / DNI en el molinete.
             </p>
         </div>
         <div class="d-flex gap-2 flex-wrap">
-            <button class="btn btn-success btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoLocker">
-                <i class="bi bi-plus-circle-fill me-1"></i> + Nuevo Locker / Casillero
+            <button class="btn btn-danger btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoLocker">
+                <i class="bi bi-plus-circle-fill me-1"></i> + Nuevo Locker
             </button>
-            <a th:href="@{/asistencias/control-acceso}" class="btn btn-outline-danger btn-sm fw-bold">
-                <i class="bi bi-qr-code-scan me-1"></i> Ir a Control de Acceso
+            <button class="btn btn-success btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAsignarManual" onclick="resetModalAsignar()">
+                <i class="bi bi-lightning-charge-fill me-1"></i> Asignación Manual
+            </button>
+            <a th:href="@{/asistencias/control-acceso}" class="btn btn-outline-dark btn-sm fw-bold">
+                <i class="bi bi-qr-code-scan me-1 text-danger"></i> Control de Acceso
             </a>
-            <button class="btn btn-primary btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAsignarManual">
-                <i class="bi bi-person-plus me-1"></i> Asignación Manual
-            </button>
-            <form th:action="@{/casilleros/liberar-todos}" method="post" onsubmit="return confirm('¿Está seguro de liberar TODOS los casilleros del turno?');">
+            <form th:action="@{/casilleros/liberar-todos}" method="post" onsubmit="return confirm('¿Está seguro de liberar TODOS los casilleros del turno?');" class="d-inline">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit" class="btn btn-outline-secondary btn-sm fw-bold">
-                    <i class="bi bi-arrow-repeat me-1"></i> Cierre de Turno / Liberar Todos
+                    <i class="bi bi-arrow-repeat me-1"></i> Liberar Todos
                 </button>
             </form>
         </div>
@@ -47,28 +47,6 @@
     <div th:if="${warning != null}" class="alert alert-warning alert-dismissible fade show shadow-sm border-0" role="alert">
         <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${warning}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-
-    <!-- Barra de Filtros por Piso del Local -->
-    <div class="card border-0 shadow-sm mb-4 p-3 bg-white" style="border-radius: 14px; border-left: 5px solid #dc3545 !important;">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <span class="text-dark small fw-bold"><i class="bi bi-building me-1 text-danger"></i> Distribución por Pisos del Local:</span>
-                <a th:href="@{/casilleros}" class="btn btn-sm" th:classappend="${pisoSeleccionado == null ? 'btn-dark' : 'btn-outline-secondary'}">
-                    🏢 Todos los Pisos (<span th:text="${casilleros.size()}"></span>)
-                </a>
-                <a th:each="p : ${pisos}" th:href="@{/casilleros(piso=${p})}" class="btn btn-sm" 
-                   th:classappend="${pisoSeleccionado == p ? 'btn-danger fw-bold shadow-sm' : 'btn-outline-danger'}" 
-                   th:text="'📍 Piso ' + ${p}">
-                    Piso 1
-                </a>
-            </div>
-            <div class="text-muted small">
-                <span class="badge bg-light text-dark border">
-                    <i class="bi bi-info-circle me-1 text-primary"></i> Asignación automática por cercanía de piso al ingresar
-                </span>
-            </div>
-        </div>
     </div>
 
     <!-- Tarjetas de Métricas de Casilleros -->
@@ -101,10 +79,56 @@
                     <i class="bi bi-shield-check fs-1 text-primary"></i>
                     <div class="text-start">
                         <div class="fs-2 fw-bold text-dark" th:text="${casilleros.size()}">24</div>
-                        <div class="small text-muted fw-semibold">LOCKERS EN ESTA VISTA</div>
+                        <div class="small text-muted fw-semibold">CAPACIDAD TOTAL REGISTRADA</div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Panel de Navegación por Pisos y Búsqueda en Tiempo Real -->
+    <div class="card border-0 shadow-sm mb-4 p-3 bg-white" style="border-radius: 14px; border-left: 5px solid #dc3545 !important;">
+        <div class="row g-3 align-items-center">
+            <!-- Pestañas de Pisos -->
+            <div class="col-lg-7">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="text-dark small fw-bold"><i class="bi bi-building me-1 text-danger"></i> Nivel / Piso:</span>
+                    <a th:href="@{/casilleros}" class="btn btn-sm" th:classappend="${pisoSeleccionado == null ? 'btn-dark fw-bold shadow-sm' : 'btn-outline-secondary'}">
+                        🏢 Todos los Pisos (<span th:text="${casilleros.size()}"></span>)
+                    </a>
+                    <a th:each="p : ${pisos}" th:href="@{/casilleros(piso=${p})}" class="btn btn-sm" 
+                       th:classappend="${pisoSeleccionado == p ? 'btn-danger fw-bold shadow-sm' : 'btn-outline-danger'}" 
+                       th:text="'📍 Piso ' + ${p}">
+                        Piso 1
+                    </a>
+                </div>
+            </div>
+            <!-- Búsqueda en Vivo -->
+            <div class="col-lg-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" id="buscadorCasilleros" class="form-control border-start-0 ps-0" 
+                           placeholder="Buscar por N° (ej: L-01), socio o DNI..." onkeyup="filtrarEnTiempoReal()" />
+                    <button class="btn btn-outline-secondary" type="button" onclick="limpiarBuscador()" title="Limpiar"><i class="bi bi-x-lg"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros Rápidos de Estado -->
+        <div class="d-flex align-items-center gap-2 mt-3 pt-2 border-top flex-wrap">
+            <span class="small text-muted fw-bold me-1">Filtrar por estado:</span>
+            <button type="button" class="btn btn-sm btn-outline-dark active filter-btn" onclick="filtrarPorEstado('TODOS', this)">
+                Todos (<span th:text="${casilleros.size()}"></span>)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-success filter-btn" onclick="filtrarPorEstado('DISPONIBLE', this)">
+                <i class="bi bi-unlock-fill me-1"></i> Libres (<span th:text="${totalLibres}"></span>)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger filter-btn" onclick="filtrarPorEstado('OCUPADO', this)">
+                <i class="bi bi-lock-fill me-1"></i> En Uso (<span th:text="${totalOcupados}"></span>)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary filter-btn" onclick="filtrarPorEstado('MANTENIMIENTO', this)">
+                <i class="bi bi-tools me-1"></i> Taller / Mantenimiento
+            </button>
         </div>
     </div>
 
@@ -112,87 +136,157 @@
     <div class="card shadow-sm border-0 mb-4" style="border-radius: 16px;">
         <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h5 class="h6 fw-bold mb-0 text-dark">
-                <i class="bi bi-door-closed me-2 text-danger"></i> Estado de Todos los Lockers
+                <i class="bi bi-door-closed me-2 text-danger"></i> Estado de Todos los Lockers del Local
             </h5>
             <div class="d-flex gap-2">
                 <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Verde: Disponible</span>
-                <span class="badge bg-danger"><i class="bi bi-lock me-1"></i> Rojo: Ocupado</span>
-                <span class="badge bg-secondary"><i class="bi bi-tools me-1"></i> Gris: Mantenimiento</span>
+                <span class="badge bg-danger"><i class="bi bi-lock me-1"></i> Rojo: Ocupado en Uso</span>
+                <span class="badge bg-secondary"><i class="bi bi-tools me-1"></i> Gris: Taller</span>
             </div>
         </div>
-        <div class="card-body p-4">
-            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
-                <div class="col" th:each="c : ${casilleros}">
+        <div class="card-body p-3 p-md-4">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3" id="contenedorLockers">
+                <div class="col locker-col" th:each="c : ${casilleros}"
+                     th:attr="data-numero=${c.numero}, 
+                              data-estado=${c.estado}, 
+                              data-piso=${c.piso != null && c.piso > 0 ? c.piso : 1}, 
+                              data-nombre=${c.ocupadoPorNombre != null ? c.ocupadoPorNombre : ''}, 
+                              data-dni=${c.ocupadoPorDni != null ? c.ocupadoPorDni : ''}">
                     
-                    <!-- Casillero DISPONIBLE -->
-                    <div th:if="${c.estado == 'DISPONIBLE'}" 
-                         class="card h-100 border-2 border-success shadow-sm p-3 text-center bg-light position-relative"
-                         style="border-radius: 14px; transition: transform 0.2s;"
-                         onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-                        <span class="badge bg-dark position-absolute top-0 start-0 m-2" style="font-size: 0.65rem;" th:text="'Piso ' + ${c.piso}">Piso 1</span>
-                        <div class="badge bg-success position-absolute top-0 end-0 m-2">LIBRE</div>
-                        <i class="bi bi-unlock-fill fs-1 text-success my-2"></i>
-                        <h4 class="h5 fw-bold text-dark mb-0" th:text="${c.numero}">L-01</h4>
-                        <div class="small text-muted mt-1 text-truncate" style="font-size: 0.75rem;" th:text="${c.ubicacion}" th:title="${c.ubicacion}">Vestuario</div>
+                    <!-- 1. CASILLERO OCUPADO (ROJO VIVO CON DATOS COMPLETOS DEL USUARIO) -->
+                    <div th:if="${c.estado == 'OCUPADO'}" 
+                         class="card h-100 border-2 border-danger shadow-sm p-3 text-center position-relative d-flex flex-column justify-content-between"
+                         style="border-radius: 14px; background: linear-gradient(180deg, #fff5f5 0%, #ffffff 100%);">
                         
-                        <div class="d-flex gap-1 mt-2">
-                            <form th:action="@{/casilleros/mantenimiento/{id}(id=${c.id})}" method="post" class="w-50">
+                        <!-- Badges Superiores -->
+                        <div class="d-flex justify-content-between align-items-center w-100 mb-2">
+                            <span class="badge bg-dark text-white fw-semibold" style="font-size: 0.7rem;" 
+                                  th:text="'📍 Piso ' + (${c.piso != null && c.piso > 0 ? c.piso : 1})">📍 Piso 1</span>
+                            <span class="badge bg-danger fw-bold shadow-sm" style="font-size: 0.7rem;">
+                                <i class="bi bi-lock-fill me-1"></i> EN USO
+                            </span>
+                        </div>
+
+                        <!-- Número y Sector -->
+                        <div class="my-1">
+                            <h3 class="h4 fw-black text-danger mb-0" th:text="${c.numero}">L-01</h3>
+                            <div class="small text-muted text-truncate" style="font-size: 0.75rem;" th:text="${c.ubicacion}" th:title="${c.ubicacion}">Vestidor Varones</div>
+                        </div>
+
+                        <!-- FICHA VISIBLE DEL OCUPANTE (¿QUIÉN LO ESTÁ USANDO?) -->
+                        <div class="p-2 my-2 rounded-3 text-start border border-danger-subtle shadow-sm" style="background-color: #fff9f9;">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; min-width: 28px;">
+                                    <i class="bi bi-person-fill" style="font-size: 0.85rem;"></i>
+                                </div>
+                                <div class="w-100 overflow-hidden">
+                                    <div class="fw-bold text-dark text-truncate" style="font-size: 0.82rem;" 
+                                         th:text="${c.ocupadoPorNombre != null && !c.ocupadoPorNombre.isEmpty() ? c.ocupadoPorNombre : 'Socio Activo'}"
+                                         th:title="${c.ocupadoPorNombre}">
+                                        Juan Carlos Perez
+                                    </div>
+                                    <span class="badge bg-dark py-0" style="font-size: 0.62rem;" th:text="${c.ocupadoPorTipo != null ? c.ocupadoPorTipo : 'SOCIO'}">SOCIO</span>
+                                </div>
+                            </div>
+                            <div class="text-secondary small d-flex justify-content-between align-items-center pt-1 border-top border-light-subtle" style="font-size: 0.72rem;">
+                                <span><i class="bi bi-card-heading text-danger me-1"></i><strong>DNI:</strong> <span th:text="${c.ocupadoPorDni != null && !c.ocupadoPorDni.isEmpty() ? c.ocupadoPorDni : '---'}">72345678</span></span>
+                                <span th:if="${c.fechaOcupacion != null}" class="text-danger fw-semibold" title="Hora de ingreso">
+                                    <i class="bi bi-clock"></i> <span th:text="${#temporals.format(c.fechaOcupacion, 'hh:mm a')}">08:30 am</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Acciones del Casillero Ocupado -->
+                        <div class="d-flex gap-1 mt-auto pt-1">
+                            <form th:action="@{/casilleros/liberar/{id}(id=${c.id})}" method="post" class="w-75" onsubmit="return confirm('¿Confirmar liberación de este casillero?');">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                <button type="submit" class="btn btn-outline-secondary btn-sm py-0 w-100" style="font-size: 0.7rem;" title="Poner en taller / reparar">
-                                    <i class="bi bi-tools"></i> Reparar
+                                <button type="submit" class="btn btn-danger btn-sm w-100 fw-bold py-1 shadow-sm" style="font-size: 0.75rem;">
+                                    <i class="bi bi-unlock-fill me-1"></i> Liberar
                                 </button>
                             </form>
-                            <button type="button" class="btn btn-outline-primary btn-sm py-0 w-50" style="font-size: 0.7rem;"
-                                    th:attr="data-id=${c.id}, data-numero=${c.numero}, data-piso=${c.piso}, data-ubicacion=${c.ubicacion}"
-                                    onclick="abrirModalEditar(this)" title="Editar Casillero">
+                            <button type="button" class="btn btn-outline-secondary btn-sm py-1 w-25" style="font-size: 0.75rem;"
+                                    th:attr="data-id=${c.id}, data-numero=${c.numero}, data-piso=${c.piso != null && c.piso > 0 ? c.piso : 1}, data-ubicacion=${c.ubicacion}"
+                                    onclick="abrirModalEditar(this)" title="Modificar piso o sector">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. CASILLERO DISPONIBLE (VERDE LISTO PARA ASIGNAR EN 1 CLIC) -->
+                    <div th:if="${c.estado == 'DISPONIBLE'}" 
+                         class="card h-100 border-2 border-success shadow-sm p-3 text-center bg-light position-relative d-flex flex-column justify-content-between"
+                         style="border-radius: 14px; transition: transform 0.2s; background: linear-gradient(180deg, #f8fff9 0%, #ffffff 100%);">
+                        
+                        <!-- Badges Superiores -->
+                        <div class="d-flex justify-content-between align-items-center w-100 mb-2">
+                            <span class="badge bg-dark text-white fw-semibold" style="font-size: 0.7rem;" 
+                                  th:text="'📍 Piso ' + (${c.piso != null && c.piso > 0 ? c.piso : 1})">📍 Piso 1</span>
+                            <span class="badge bg-success fw-bold" style="font-size: 0.7rem;">
+                                <i class="bi bi-unlock-fill me-1"></i> LIBRE
+                            </span>
+                        </div>
+
+                        <!-- Número y Sector -->
+                        <div class="my-1">
+                            <i class="bi bi-unlock-fill fs-2 text-success my-1 d-block"></i>
+                            <h3 class="h4 fw-black text-dark mb-0" th:text="${c.numero}">L-02</h3>
+                            <div class="small text-muted text-truncate" style="font-size: 0.75rem;" th:text="${c.ubicacion}" th:title="${c.ubicacion}">Vestidor Varones</div>
+                        </div>
+
+                        <!-- Botón Principal: ASIGNAR RÁPIDO EN 1 CLIC -->
+                        <div class="my-2">
+                            <button type="button" class="btn btn-success btn-sm w-100 fw-bold py-2 shadow-sm"
+                                    th:attr="data-id=${c.id}, data-numero=${c.numero}, data-piso=${c.piso != null && c.piso > 0 ? c.piso : 1}, data-ubicacion=${c.ubicacion}"
+                                    onclick="abrirModalAsignarDirecto(this)">
+                                <i class="bi bi-lightning-charge-fill me-1"></i> Asignar Locker
+                            </button>
+                        </div>
+
+                        <!-- Opciones de Administración -->
+                        <div class="d-flex gap-1 mt-auto pt-1">
+                            <form th:action="@{/casilleros/mantenimiento/{id}(id=${c.id})}" method="post" class="w-50">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="btn btn-outline-secondary btn-sm py-1 w-100" style="font-size: 0.7rem;" title="Poner en taller o mantenimiento">
+                                    <i class="bi bi-tools"></i> Taller
+                                </button>
+                            </form>
+                            <button type="button" class="btn btn-outline-primary btn-sm py-1 w-50" style="font-size: 0.7rem;"
+                                    th:attr="data-id=${c.id}, data-numero=${c.numero}, data-piso=${c.piso != null && c.piso > 0 ? c.piso : 1}, data-ubicacion=${c.ubicacion}"
+                                    onclick="abrirModalEditar(this)" title="Modificar número o piso">
                                 <i class="bi bi-pencil"></i> Editar
                             </button>
                         </div>
                     </div>
 
-                    <!-- Casillero OCUPADO -->
-                    <div th:if="${c.estado == 'OCUPADO'}" 
-                         class="card h-100 border-2 border-danger shadow p-3 text-center position-relative"
-                         style="border-radius: 14px; background: #fff5f5; transition: transform 0.2s;"
-                         onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-                        <span class="badge bg-dark position-absolute top-0 start-0 m-2" style="font-size: 0.65rem;" th:text="'Piso ' + ${c.piso}">Piso 1</span>
-                        <div class="badge bg-danger position-absolute top-0 end-0 m-2">EN USO</div>
-                        <i class="bi bi-lock-fill fs-1 text-danger my-1"></i>
-                        <h4 class="h5 fw-bold text-dark mb-1" th:text="${c.numero}">L-02</h4>
-                        <div class="badge bg-dark mb-1" style="font-size: 0.65rem;" th:text="${c.ocupadoPorTipo}">SOCIO</div>
-                        <div class="fw-semibold text-truncate small text-dark" th:text="${c.ocupadoPorNombre}" th:title="${c.ocupadoPorNombre}">Juan Perez</div>
-                        <div class="text-muted" style="font-size: 0.7rem;">DNI: <span th:text="${c.ocupadoPorDni}">72345678</span></div>
-                        <div class="text-primary mt-1" style="font-size: 0.7rem;" th:if="${c.fechaOcupacion != null}">
-                            <i class="bi bi-clock"></i> <span th:text="${#temporals.format(c.fechaOcupacion, 'HH:mm')}">08:30</span>
-                        </div>
-                        
-                        <!-- Botón Liberar Manual -->
-                        <form th:action="@{/casilleros/liberar/{id}(id=${c.id})}" method="post" class="mt-2">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button type="submit" class="btn btn-danger btn-sm py-1 w-100 fw-bold" style="font-size: 0.75rem;">
-                                <i class="bi bi-unlock"></i> Liberar
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Casillero MANTENIMIENTO -->
+                    <!-- 3. CASILLERO EN MANTENIMIENTO / TALLER -->
                     <div th:if="${c.estado == 'MANTENIMIENTO'}" 
-                         class="card h-100 border-2 border-secondary shadow-sm p-3 text-center bg-secondary-subtle position-relative"
+                         class="card h-100 border-2 border-secondary shadow-sm p-3 text-center bg-secondary-subtle position-relative d-flex flex-column justify-content-between"
                          style="border-radius: 14px;">
-                        <span class="badge bg-dark position-absolute top-0 start-0 m-2" style="font-size: 0.65rem;" th:text="'Piso ' + ${c.piso}">Piso 1</span>
-                        <div class="badge bg-secondary position-absolute top-0 end-0 m-2">TALLER</div>
-                        <i class="bi bi-tools fs-1 text-secondary my-2"></i>
-                        <h4 class="h5 fw-bold text-dark mb-0" th:text="${c.numero}">L-03</h4>
-                        <div class="small text-muted mt-1" style="font-size: 0.75rem;">En Reparación</div>
-                        <div class="d-flex gap-1 mt-2">
+                        
+                        <!-- Badges Superiores -->
+                        <div class="d-flex justify-content-between align-items-center w-100 mb-2">
+                            <span class="badge bg-dark text-white fw-semibold" style="font-size: 0.7rem;" 
+                                  th:text="'📍 Piso ' + (${c.piso != null && c.piso > 0 ? c.piso : 1})">📍 Piso 1</span>
+                            <span class="badge bg-secondary fw-bold" style="font-size: 0.7rem;">
+                                <i class="bi bi-tools me-1"></i> TALLER
+                            </span>
+                        </div>
+
+                        <div class="my-2">
+                            <i class="bi bi-tools fs-2 text-secondary my-1 d-block"></i>
+                            <h3 class="h4 fw-black text-dark mb-0" th:text="${c.numero}">L-03</h3>
+                            <div class="small text-muted" style="font-size: 0.75rem;">En Reparación</div>
+                        </div>
+
+                        <div class="d-flex gap-1 mt-auto pt-2">
                             <form th:action="@{/casilleros/mantenimiento/{id}(id=${c.id})}" method="post" class="w-50">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                <button type="submit" class="btn btn-success btn-sm py-0 w-100" style="font-size: 0.7rem;">
-                                    <i class="bi bi-check-lg"></i> Activar
+                                <button type="submit" class="btn btn-success btn-sm py-1 w-100 fw-bold" style="font-size: 0.7rem;">
+                                    <i class="bi bi-check-lg"></i> Habilitar
                                 </button>
                             </form>
-                            <button type="button" class="btn btn-outline-primary btn-sm py-0 w-50" style="font-size: 0.7rem;"
-                                    th:attr="data-id=${c.id}, data-numero=${c.numero}, data-piso=${c.piso}, data-ubicacion=${c.ubicacion}"
+                            <button type="button" class="btn btn-outline-primary btn-sm py-1 w-50" style="font-size: 0.7rem;"
+                                    th:attr="data-id=${c.id}, data-numero=${c.numero}, data-piso=${c.piso != null && c.piso > 0 ? c.piso : 1}, data-ubicacion=${c.ubicacion}"
                                     onclick="abrirModalEditar(this)">
                                 <i class="bi bi-pencil"></i> Editar
                             </button>
@@ -200,6 +294,93 @@
                     </div>
 
                 </div>
+            </div>
+            
+            <!-- Mensaje cuando la búsqueda no encuentra casilleros -->
+            <div id="mensajeSinResultados" class="text-center py-5 d-none">
+                <i class="bi bi-search fs-1 text-muted d-block mb-2"></i>
+                <h5 class="fw-bold text-dark">No se encontraron casilleros</h5>
+                <p class="text-muted small">No hay ningún casillero que coincida con el término de búsqueda ingresado.</p>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="limpiarBuscador()">Restablecer Búsqueda</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE ASIGNACIÓN MANUAL / RÁPIDA (INTUITIVO CON AUTOCOMPLETADO DE SOCIOS) -->
+    <div class="modal fade" id="modalAsignarManual" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-lightning-charge-fill text-warning me-2"></i> Asignar Casillero a Usuario
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/casilleros/asignar-manual}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div class="modal-body p-4">
+
+                        <!-- Casillero Seleccionado -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Casillero a Asignar *</label>
+                            <select name="casilleroId" id="selectCasilleroAsignar" class="form-select fw-bold text-danger" required>
+                                <option value="" disabled selected>-- Seleccione Locker Libre --</option>
+                                <option th:each="c : ${casilleros}" th:if="${c.estado == 'DISPONIBLE'}" 
+                                        th:value="${c.id}" 
+                                        th:text="${c.numero + ' (Piso ' + (c.piso != null && c.piso > 0 ? c.piso : 1) + ' — ' + c.ubicacion + ')'}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Autocompletado rápido desde Socios Registrados -->
+                        <div class="mb-3 p-3 bg-light rounded-3 border">
+                            <label class="form-label fw-bold text-danger small mb-1">
+                                <i class="bi bi-people-fill me-1"></i> Seleccionar Socio Registrado (Opcional)
+                            </label>
+                            <select class="form-select form-select-sm" id="comboSociosRegistrados" onchange="autocompletarSocio(this)">
+                                <option value="">-- Autocompletar con un Cliente --</option>
+                                <option th:each="cl : ${clientes}" 
+                                        th:value="${cl.dni}" 
+                                        th:attr="data-nombre=${cl.nombreCompleto}, data-dni=${cl.dni}" 
+                                        th:text="${cl.nombreCompleto + ' — DNI: ' + cl.dni}">
+                                </option>
+                            </select>
+                            <div class="form-text text-muted" style="font-size: 0.75rem;">Al seleccionar, se rellenarán automáticamente el nombre y DNI.</div>
+                        </div>
+
+                        <!-- Tipo de Ocupante -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Tipo de Ocupante</label>
+                            <select name="tipo" class="form-select" id="selectTipoOcupante" required>
+                                <option value="SOCIO" selected>Socio / Cliente del Gimnasio</option>
+                                <option value="ENTRENADOR">Entrenador / Coach</option>
+                                <option value="RECEPCION">Personal Administrativo / Recepción</option>
+                            </select>
+                        </div>
+
+                        <!-- Nombre Completo -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Nombre y Apellidos del Ocupante *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white text-muted"><i class="bi bi-person"></i></span>
+                                <input type="text" name="nombre" id="inputNombreOcupante" class="form-control" placeholder="Ej: Juan Carlos Pérez" required />
+                            </div>
+                        </div>
+
+                        <!-- DNI -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">DNI / Documento de Identidad *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white text-muted"><i class="bi bi-card-heading"></i></span>
+                                <input type="text" name="dni" id="inputDniOcupante" class="form-control" placeholder="Ej: 72345678" required />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success fw-bold"><i class="bi bi-check-circle me-1"></i> Asignar Locker Ahora</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -217,7 +398,7 @@
                     <div class="modal-body p-4">
                         <div class="mb-3">
                             <label class="form-label fw-bold small">Número / Código del Locker *</label>
-                            <input type="text" name="numero" class="form-control text-uppercase" placeholder="Ej: L-06, L-07, 201, 301" required />
+                            <input type="text" name="numero" class="form-control text-uppercase" placeholder="Ej: L-07, L-08, L-20" required />
                             <div class="form-text small">Debe ser único en el gimnasio.</div>
                         </div>
                         <div class="mb-3">
@@ -289,53 +470,11 @@
         </div>
     </div>
 
-    <!-- MODAL DE ASIGNACIÓN MANUAL -->
-    <div class="modal fade" id="modalAsignarManual" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-person-plus text-danger me-2"></i> Asignar Casillero Manualmente</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <form th:action="@{/casilleros/asignar-manual}" method="post">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                    <div class="modal-body p-4">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">Seleccionar Casillero Disponible</label>
-                            <select name="casilleroId" class="form-select" required>
-                                <option value="" disabled selected>-- Seleccione Locker Libre --</option>
-                                <option th:each="c : ${casilleros}" th:if="${c.estado == 'DISPONIBLE'}" th:value="${c.id}" th:text="${c.numero + ' (Piso ' + c.piso + ' — ' + c.ubicacion + ')'}"></option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">Tipo de Ocupante</label>
-                            <select name="tipo" class="form-select" id="selectTipoOcupante" required>
-                                <option value="SOCIO">Socio / Cliente</option>
-                                <option value="ENTRENADOR">Entrenador / Coach</option>
-                                <option value="RECEPCION">Personal / Recepción</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">Nombre Completo del Ocupante</label>
-                            <input type="text" name="nombre" class="form-control" placeholder="Ej: Juan Carlos Perez" required />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">DNI / Documento</label>
-                            <input type="text" name="dni" class="form-control" placeholder="Ej: 72345678" required />
-                        </div>
-                    </div>
-                    <div class="modal-footer bg-light">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-danger fw-bold"><i class="bi bi-check-circle me-1"></i> Asignar Locker</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
 </div>
 
+<!-- SCRIPT DE INTERACTIVIDAD RÁPIDA -->
 <script>
+    // 1. Abrir Modal de Edición
     function abrirModalEditar(btn) {
         document.getElementById('editId').value = btn.getAttribute('data-id');
         document.getElementById('editNumero').value = btn.getAttribute('data-numero');
@@ -343,9 +482,91 @@
         document.getElementById('editUbicacion').value = btn.getAttribute('data-ubicacion') || '';
         new bootstrap.Modal(document.getElementById('modalEditarLocker')).show();
     }
-</script>
 
-</div>
+    // 2. Asignación directa en 1 clic desde la tarjeta libre
+    function abrirModalAsignarDirecto(btn) {
+        const id = btn.getAttribute('data-id');
+        const selectLocker = document.getElementById('selectCasilleroAsignar');
+        if (selectLocker) {
+            selectLocker.value = id;
+        }
+        resetCamposAsignar();
+        new bootstrap.Modal(document.getElementById('modalAsignarManual')).show();
+    }
+
+    function resetModalAsignar() {
+        document.getElementById('selectCasilleroAsignar').selectedIndex = 0;
+        resetCamposAsignar();
+    }
+
+    function resetCamposAsignar() {
+        document.getElementById('comboSociosRegistrados').selectedIndex = 0;
+        document.getElementById('inputNombreOcupante').value = '';
+        document.getElementById('inputDniOcupante').value = '';
+    }
+
+    // 3. Autocompletar datos al seleccionar socio de la lista
+    function autocompletarSocio(select) {
+        const opt = select.options[select.selectedIndex];
+        if (opt && opt.value) {
+            document.getElementById('inputNombreOcupante').value = opt.getAttribute('data-nombre') || '';
+            document.getElementById('inputDniOcupante').value = opt.getAttribute('data-dni') || '';
+            document.getElementById('selectTipoOcupante').value = 'SOCIO';
+        }
+    }
+
+    // 4. Búsqueda y filtrado en tiempo real
+    let estadoFiltroActivo = 'TODOS';
+
+    function filtrarPorEstado(estado, btn) {
+        estadoFiltroActivo = estado;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filtrarEnTiempoReal();
+    }
+
+    function filtrarEnTiempoReal() {
+        const query = (document.getElementById('buscadorCasilleros').value || '').toLowerCase().trim();
+        const items = document.querySelectorAll('.locker-col');
+        let visibles = 0;
+
+        items.forEach(item => {
+            const numero = (item.getAttribute('data-numero') || '').toLowerCase();
+            const estado = (item.getAttribute('data-estado') || '').toUpperCase();
+            const piso = (item.getAttribute('data-piso') || '');
+            const nombre = (item.getAttribute('data-nombre') || '').toLowerCase();
+            const dni = (item.getAttribute('data-dni') || '').toLowerCase();
+
+            const matchTexto = !query || numero.includes(query) || nombre.includes(query) || dni.includes(query) || ('piso ' + piso).includes(query);
+            const matchEstado = (estadoFiltroActivo === 'TODOS') || (estado === estadoFiltroActivo);
+
+            if (matchTexto && matchEstado) {
+                item.style.display = '';
+                visibles++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        const noRes = document.getElementById('mensajeSinResultados');
+        if (noRes) {
+            if (visibles === 0) {
+                noRes.classList.remove('d-none');
+            } else {
+                noRes.classList.add('d-none');
+            }
+        }
+    }
+
+    function limpiarBuscador() {
+        document.getElementById('buscadorCasilleros').value = '';
+        estadoFiltroActivo = 'TODOS';
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        const primerBtn = document.querySelector('.filter-btn');
+        if (primerBtn) primerBtn.classList.add('active');
+        filtrarEnTiempoReal();
+    }
+</script>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
