@@ -20,6 +20,9 @@ public class Casillero {
     @Column(nullable = false, length = 30)
     private String estado = "DISPONIBLE"; // "DISPONIBLE", "OCUPADO", "MANTENIMIENTO"
 
+    @Column(nullable = false)
+    private Integer piso = 1; // 1, 2, 3, etc.
+
     @Column(name = "ocupado_por_nombre", length = 150)
     private String ocupadoPorNombre;
 
@@ -36,9 +39,14 @@ public class Casillero {
     }
 
     public Casillero(Long id, String numero, String ubicacion, String estado) {
+        this(id, numero, ubicacion, 1, estado);
+    }
+
+    public Casillero(Long id, String numero, String ubicacion, Integer piso, String estado) {
         this.id = id;
         this.numero = numero;
         this.ubicacion = ubicacion;
+        this.piso = (piso != null && piso > 0) ? piso : 1;
         this.estado = estado;
     }
 
@@ -104,6 +112,14 @@ public class Casillero {
 
     public void setFechaOcupacion(LocalDateTime fechaOcupacion) {
         this.fechaOcupacion = fechaOcupacion;
+    }
+
+    public Integer getPiso() {
+        return piso != null ? piso : 1;
+    }
+
+    public void setPiso(Integer piso) {
+        this.piso = (piso != null && piso > 0) ? piso : 1;
     }
 
     public boolean isDisponible() {

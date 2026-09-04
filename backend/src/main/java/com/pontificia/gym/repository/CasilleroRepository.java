@@ -10,8 +10,10 @@ import java.util.Optional;
 @Repository
 public interface CasilleroRepository extends JpaRepository<Casillero, Long> {
     List<Casillero> findAllByOrderByNumeroAsc();
+    List<Casillero> findByPisoOrderByNumeroAsc(Integer piso);
     List<Casillero> findByEstado(String estado);
     Optional<Casillero> findByNumero(String numero);
+    boolean existsByNumero(String numero);
     Optional<Casillero> findByOcupadoPorDni(String dni);
     long countByEstado(String estado);
 }

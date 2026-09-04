@@ -17,6 +17,9 @@
             </p>
         </div>
         <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-success btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoLocker">
+                <i class="bi bi-plus-circle-fill me-1"></i> + Nuevo Locker / Casillero
+            </button>
             <a th:href="@{/asistencias/control-acceso}" class="btn btn-outline-danger btn-sm fw-bold">
                 <i class="bi bi-qr-code-scan me-1"></i> Ir a Control de Acceso
             </a>
@@ -37,9 +40,35 @@
         <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${success}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
+    <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     <div th:if="${warning != null}" class="alert alert-warning alert-dismissible fade show shadow-sm border-0" role="alert">
         <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${warning}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Barra de Filtros por Piso del Local -->
+    <div class="card border-0 shadow-sm mb-4 p-3 bg-white" style="border-radius: 14px; border-left: 5px solid #dc3545 !important;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="text-dark small fw-bold"><i class="bi bi-building me-1 text-danger"></i> Distribución por Pisos del Local:</span>
+                <a th:href="@{/casilleros}" class="btn btn-sm" th:classappend="${pisoSeleccionado == null ? 'btn-dark' : 'btn-outline-secondary'}">
+                    🏢 Todos los Pisos (<span th:text="${casilleros.size()}"></span>)
+                </a>
+                <a th:each="p : ${pisos}" th:href="@{/casilleros(piso=${p})}" class="btn btn-sm" 
+                   th:classappend="${pisoSeleccionado == p ? 'btn-danger fw-bold shadow-sm' : 'btn-outline-danger'}" 
+                   th:text="'📍 Piso ' + ${p}">
+                    Piso 1
+                </a>
+            </div>
+            <div class="text-muted small">
+                <span class="badge bg-light text-dark border">
+                    <i class="bi bi-info-circle me-1 text-primary"></i> Asignación automática por cercanía de piso al ingresar
+                </span>
+            </div>
+        </div>
     </div>
 
     <!-- Tarjetas de Métricas de Casilleros -->
@@ -72,7 +101,7 @@
                     <i class="bi bi-shield-check fs-1 text-primary"></i>
                     <div class="text-start">
                         <div class="fs-2 fw-bold text-dark" th:text="${casilleros.size()}">24</div>
-                        <div class="small text-muted fw-semibold">CAPACIDAD TOTAL DE LOCKERS</div>
+                        <div class="small text-muted fw-semibold">LOCKERS EN ESTA VISTA</div>
                     </div>
                 </div>
             </div>
@@ -100,16 +129,25 @@
                          class="card h-100 border-2 border-success shadow-sm p-3 text-center bg-light position-relative"
                          style="border-radius: 14px; transition: transform 0.2s;"
                          onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                        <span class="badge bg-dark position-absolute top-0 start-0 m-2" style="font-size: 0.65rem;" th:text="'Piso ' + ${c.piso}">Piso 1</span>
                         <div class="badge bg-success position-absolute top-0 end-0 m-2">LIBRE</div>
                         <i class="bi bi-unlock-fill fs-1 text-success my-2"></i>
                         <h4 class="h5 fw-bold text-dark mb-0" th:text="${c.numero}">L-01</h4>
-                        <div class="small text-muted mt-1" style="font-size: 0.75rem;" th:text="${c.ubicacion}">Vestuario</div>
-                        <form th:action="@{/casilleros/mantenimiento/{id}(id=${c.id})}" method="post" class="mt-3">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button type="submit" class="btn btn-outline-secondary btn-sm py-0 w-100" style="font-size: 0.7rem;">
-                                <i class="bi bi-tools"></i> Reparar
+                        <div class="small text-muted mt-1 text-truncate" style="font-size: 0.75rem;" th:text="${c.ubicacion}" th:title="${c.ubicacion}">Vestuario</div>
+                        
+                        <div class="d-flex gap-1 mt-2">
+                            <form th:action="@{/casilleros/mantenimiento/{id}(id=${c.id})}" method="post" class="w-50">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="btn btn-outline-secondary btn-sm py-0 w-100" style="font-size: 0.7rem;" title="Poner en taller / reparar">
+                                    <i class="bi bi-tools"></i> Reparar
+                                </button>
+                            </form>
+                            <button type="button" class="btn btn-outline-primary btn-sm py-0 w-50" style="font-size: 0.7rem;"
+                                    th:attr="data-id=${c.id}, data-numero=${c.numero}, data-piso=${c.piso}, data-ubicacion=${c.ubicacion}"
+                                    onclick="abrirModalEditar(this)" title="Editar Casillero">
+                                <i class="bi bi-pencil"></i> Editar
                             </button>
-                        </form>
+                        </div>
                     </div>
 
                     <!-- Casillero OCUPADO -->
@@ -117,6 +155,7 @@
                          class="card h-100 border-2 border-danger shadow p-3 text-center position-relative"
                          style="border-radius: 14px; background: #fff5f5; transition: transform 0.2s;"
                          onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                        <span class="badge bg-dark position-absolute top-0 start-0 m-2" style="font-size: 0.65rem;" th:text="'Piso ' + ${c.piso}">Piso 1</span>
                         <div class="badge bg-danger position-absolute top-0 end-0 m-2">EN USO</div>
                         <i class="bi bi-lock-fill fs-1 text-danger my-1"></i>
                         <h4 class="h5 fw-bold text-dark mb-1" th:text="${c.numero}">L-02</h4>
@@ -140,19 +179,112 @@
                     <div th:if="${c.estado == 'MANTENIMIENTO'}" 
                          class="card h-100 border-2 border-secondary shadow-sm p-3 text-center bg-secondary-subtle position-relative"
                          style="border-radius: 14px;">
+                        <span class="badge bg-dark position-absolute top-0 start-0 m-2" style="font-size: 0.65rem;" th:text="'Piso ' + ${c.piso}">Piso 1</span>
                         <div class="badge bg-secondary position-absolute top-0 end-0 m-2">TALLER</div>
                         <i class="bi bi-tools fs-1 text-secondary my-2"></i>
                         <h4 class="h5 fw-bold text-dark mb-0" th:text="${c.numero}">L-03</h4>
                         <div class="small text-muted mt-1" style="font-size: 0.75rem;">En Reparación</div>
-                        <form th:action="@{/casilleros/mantenimiento/{id}(id=${c.id})}" method="post" class="mt-3">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button type="submit" class="btn btn-success btn-sm py-0 w-100" style="font-size: 0.7rem;">
-                                <i class="bi bi-check-lg"></i> Habilitar
+                        <div class="d-flex gap-1 mt-2">
+                            <form th:action="@{/casilleros/mantenimiento/{id}(id=${c.id})}" method="post" class="w-50">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="btn btn-success btn-sm py-0 w-100" style="font-size: 0.7rem;">
+                                    <i class="bi bi-check-lg"></i> Activar
+                                </button>
+                            </form>
+                            <button type="button" class="btn btn-outline-primary btn-sm py-0 w-50" style="font-size: 0.7rem;"
+                                    th:attr="data-id=${c.id}, data-numero=${c.numero}, data-piso=${c.piso}, data-ubicacion=${c.ubicacion}"
+                                    onclick="abrirModalEditar(this)">
+                                <i class="bi bi-pencil"></i> Editar
                             </button>
-                        </form>
+                        </div>
                     </div>
 
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA NUEVO CASILLERO / LOCKER (ADMINISTRADOR) -->
+    <div class="modal fade" id="modalNuevoLocker" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle-fill text-danger me-2"></i> Registrar Nuevo Casillero / Locker</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/casilleros/guardar}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Número / Código del Locker *</label>
+                            <input type="text" name="numero" class="form-control text-uppercase" placeholder="Ej: L-06, L-07, 201, 301" required />
+                            <div class="form-text small">Debe ser único en el gimnasio.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Piso del Local *</label>
+                            <select name="piso" class="form-select" required>
+                                <option value="1" selected>Piso 1</option>
+                                <option value="2">Piso 2</option>
+                                <option value="3">Piso 3</option>
+                                <option value="4">Piso 4</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Ubicación / Sector en el Piso *</label>
+                            <input type="text" name="ubicacion" class="form-control" placeholder="Ej: Vestidor Varones, Vestidor Damas, Zona Cardio, Salón Spinning" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Estado Inicial</label>
+                            <select name="estado" class="form-select">
+                                <option value="DISPONIBLE" selected>DISPONIBLE (Listo para socios)</option>
+                                <option value="MANTENIMIENTO">MANTENIMIENTO (Taller / Fuera de servicio)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger fw-bold"><i class="bi bi-save me-1"></i> Guardar Casillero</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA EDITAR CASILLERO (ADMINISTRADOR) -->
+    <div class="modal fade" id="modalEditarLocker" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square text-danger me-2"></i> Modificar Casillero / Ubicación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/casilleros/guardar}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" name="id" id="editId" />
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Número / Código del Locker *</label>
+                            <input type="text" name="numero" id="editNumero" class="form-control text-uppercase" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Piso del Local *</label>
+                            <select name="piso" id="editPiso" class="form-select" required>
+                                <option value="1">Piso 1</option>
+                                <option value="2">Piso 2</option>
+                                <option value="3">Piso 3</option>
+                                <option value="4">Piso 4</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Ubicación / Sector en el Piso *</label>
+                            <input type="text" name="ubicacion" id="editUbicacion" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary fw-bold"><i class="bi bi-check-circle me-1"></i> Guardar Cambios</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -172,7 +304,7 @@
                             <label class="form-label fw-bold small">Seleccionar Casillero Disponible</label>
                             <select name="casilleroId" class="form-select" required>
                                 <option value="" disabled selected>-- Seleccione Locker Libre --</option>
-                                <option th:each="c : ${casilleros}" th:if="${c.estado == 'DISPONIBLE'}" th:value="${c.id}" th:text="${c.numero + ' — ' + c.ubicacion}"></option>
+                                <option th:each="c : ${casilleros}" th:if="${c.estado == 'DISPONIBLE'}" th:value="${c.id}" th:text="${c.numero + ' (Piso ' + c.piso + ' — ' + c.ubicacion + ')'}"></option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -200,6 +332,18 @@
             </div>
         </div>
     </div>
+
+</div>
+
+<script>
+    function abrirModalEditar(btn) {
+        document.getElementById('editId').value = btn.getAttribute('data-id');
+        document.getElementById('editNumero').value = btn.getAttribute('data-numero');
+        document.getElementById('editPiso').value = btn.getAttribute('data-piso') || '1';
+        document.getElementById('editUbicacion').value = btn.getAttribute('data-ubicacion') || '';
+        new bootstrap.Modal(document.getElementById('modalEditarLocker')).show();
+    }
+</script>
 
 </div>
 

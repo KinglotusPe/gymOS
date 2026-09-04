@@ -141,12 +141,49 @@ public class CasilleroServiceImpl implements CasilleroService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Casillero> listarPorPiso(Integer piso) {
+        if (piso == null || piso == 0) {
+            return casilleroRepository.findAllByOrderByNumeroAsc();
+        }
+        return casilleroRepository.findByPisoOrderByNumeroAsc(piso);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Integer> listarPisos() {
+        List<Integer> pisos = casilleroRepository.findAll().stream()
+                .map(Casillero::getPiso)
+                .filter(p -> p != null && p > 0)
+                .distinct()
+                .sorted()
+                .toList();
+        if (pisos.isEmpty()) {
+            return List.of(1, 2, 3);
+        }
+        return pisos;
+    }
+
+    @Override
+    @Transactional
+    public void eliminar(Long id) {
+        casilleroRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existePorNumero(String numero) {
+        return casilleroRepository.existsByNumero(numero);
+    }
+
+    @Override
     public void inicializarCasillerosPorDefecto() {
         if (casilleroRepository.count() == 0) {
             for (int i = 1; i <= 24; i++) {
                 String num = String.format("L-%02d", i);
-                String ubicacion = (i <= 10) ? "Vestuario Masculino" : (i <= 20 ? "Vestuario Femenino" : "Zona Staff / Entrenadores");
-                casilleroRepository.save(new Casillero(null, num, ubicacion, "DISPONIBLE"));
+                int piso = (i <= 10) ? 1 : ((i <= 18) ? 2 : 3);
+                String ubicacion = (i <= 10) ? "Vestidor Varones - Piso 1" : (i <= 18 ? "Vestidor Damas - Piso 2" : "Zona Funcional & Staff - Piso 3");
+                casilleroRepository.save(new Casillero(null, num, ubicacion, piso, "DISPONIBLE"));
             }
         }
     }

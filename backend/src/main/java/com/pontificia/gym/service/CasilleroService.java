@@ -21,5 +21,10 @@ public interface CasilleroService {
     long contarDisponibles();
     long contarOcupados();
 
+    List<Casillero> listarPorPiso(Integer piso);
+    List<Integer> listarPisos();
+    void eliminar(Long id);
+    boolean existePorNumero(String numero);
+
     void inicializarCasillerosPorDefecto();
 }

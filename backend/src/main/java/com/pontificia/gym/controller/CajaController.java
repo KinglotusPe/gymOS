@@ -43,9 +43,9 @@ public class CajaController {
         CajaResumenDto resumen = auditoriaCajaService.generarResumenCaja(fechaInicio, fechaFin, cajero);
 
         model.addAttribute("resumen", resumen);
-        // Filtrar únicamente personal administrativo / cajeros (excluir clientes)
+        // Filtrar únicamente personal de caja: Administradores y Recepcionistas (excluir clientes y entrenadores)
         List<Usuario> cajeros = usuarioService.listarTodos().stream()
-                .filter(u -> u.getRol() != com.pontificia.gym.entity.Rol.ROLE_CLIENTE)
+                .filter(u -> u.getRol() == com.pontificia.gym.entity.Rol.ROLE_ADMIN || u.getRol() == com.pontificia.gym.entity.Rol.ROLE_RECEPCIONISTA)
                 .toList();
         model.addAttribute("usuarios", cajeros);
         model.addAttribute("fechaInicio", fechaInicio);
