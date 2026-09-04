@@ -15,6 +15,7 @@
 
 <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 py-2 border-bottom border-danger border-3 shadow-sm" style="background-color: #111827 !important;">
     <div class="container">
+        <!-- Logo / Marca -->
         <a class="navbar-brand d-flex align-items-center" th:href="@{/}">
             <span class="fs-4 me-2 text-danger fw-bold"><i class="bi bi-fire"></i></span>
             <div>
@@ -23,130 +24,201 @@
                 <span class="d-block text-secondary small" style="font-size: 0.75rem;">Jr. José Santos Chocano - Jesús Nazareno</span>
             </div>
         </a>
+
+        <!-- Botón Móvil -->
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navMenu">
-            <ul class="navbar-nav ms-auto gap-1 align-items-lg-center">
-                <!-- Enlaces para Admin y Recepcionista -->
+            <ul class="navbar-nav ms-auto gap-lg-2 align-items-lg-center">
+
+                <!-- ======================================================= -->
+                <!-- 1. VISTA ADMINISTRADOR Y RECEPCIÓN (MENÚS AGRUPADOS)    -->
+                <!-- ======================================================= -->
+                
+                <!-- Acceso Directo: Inicio / Dashboard -->
                 <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
-                    <a class="nav-link px-2 text-white" th:href="@{/}">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/}">
                         <i class="bi bi-grid-fill me-1 text-danger"></i> Inicio
                     </a>
                 </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
-                    <a class="nav-link px-2 text-white" th:href="@{/clientes}">
-                        <i class="bi bi-people-fill me-1 text-danger"></i> Clientes
+
+                <!-- Grupo 1: Mostrador / Operaciones Diarias -->
+                <li class="nav-item dropdown" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
+                    <a class="nav-link dropdown-toggle px-2 text-white fw-semibold" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-clipboard-check-fill me-1 text-danger"></i> Mostrador
                     </a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
-                    <a class="nav-link px-2 text-white" th:href="@{/membresias}">
-                        <i class="bi bi-card-checklist me-1 text-danger"></i> Membresías
-                    </a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
-                    <a class="nav-link px-2 text-white" th:href="@{/pagos}">
-                        <i class="bi bi-cash-coin me-1 text-danger"></i> Pagos
-                    </a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
-                    <a class="nav-link px-2 text-white" th:href="@{/asistencias}">
-                        <i class="bi bi-clock-history me-1 text-danger"></i> Asistencias
-                    </a>
-                </li>
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
-                    <a class="nav-link px-2 text-white" th:href="@{/casilleros}">
-                        <i class="bi bi-grid-3x3-gap-fill me-1 text-danger"></i> Casilleros
-                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark shadow border-0" style="background-color: #1e293b; border-radius: 12px;">
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Atención & Socios</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/clientes}">
+                                <i class="bi bi-people-fill text-danger me-2"></i> Clientes / Socios
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/membresias}">
+                                <i class="bi bi-card-checklist text-danger me-2"></i> Planes de Membresía
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider border-secondary opacity-50"></li>
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Control & Local</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/asistencias}">
+                                <i class="bi bi-qr-code-scan text-danger me-2"></i> Asistencias / Molinete QR
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/casilleros}">
+                                <i class="bi bi-grid-3x3-gap-fill text-danger me-2"></i> Mapa de Casilleros / Lockers
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
-                <!-- Enlace de Tienda / POS (Admin y Recepción) -->
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
-                    <a class="nav-link px-2 text-white" th:href="@{/tienda}">
-                        <i class="bi bi-shop me-1 text-danger"></i> Tienda
+                <!-- Grupo 2: Ventas, Caja & Finanzas -->
+                <li class="nav-item dropdown" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
+                    <a class="nav-link dropdown-toggle px-2 text-white fw-semibold" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-cash-coin me-1 text-danger"></i> Finanzas
                     </a>
+                    <ul class="dropdown-menu dropdown-menu-dark shadow border-0" style="background-color: #1e293b; border-radius: 12px;">
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Ventas & Cobranza</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/tienda}">
+                                <i class="bi bi-shop text-danger me-2"></i> Tienda / Punto de Venta
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/pagos}">
+                                <i class="bi bi-receipt text-danger me-2"></i> Historial de Pagos & Boletas
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider border-secondary opacity-50"></li>
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Flujo de Dinero</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/caja}">
+                                <i class="bi bi-wallet2 text-danger me-2"></i> Control de Caja & Arqueo
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
-                <!-- Enlace de Caja y Arqueo (Admin y Recepción) -->
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
-                    <a class="nav-link px-2 text-white" th:href="@{/caja}">
-                        <i class="bi bi-wallet2 me-1 text-danger"></i> Caja
+                <!-- Grupo 3: Fitness & Área Deportiva -->
+                <li class="nav-item dropdown" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
+                    <a class="nav-link dropdown-toggle px-2 text-white fw-semibold" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-activity me-1 text-danger"></i> Fitness
                     </a>
+                    <ul class="dropdown-menu dropdown-menu-dark shadow border-0" style="background-color: #1e293b; border-radius: 12px;">
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Planes de Entrenamiento</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/rutinas}">
+                                <i class="bi bi-journal-text text-danger me-2"></i> Rutinas de Entrenamiento
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/ejercicios}">
+                                <i class="bi bi-collection-play-fill text-danger me-2"></i> Banco de Ejercicios
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/seguimientos}">
+                                <i class="bi bi-heart-pulse-fill text-danger me-2"></i> Evaluaciones & Progreso
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider border-secondary opacity-50"></li>
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Staff & Horarios</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/entrenadores}">
+                                <i class="bi bi-person-badge-fill text-danger me-2"></i> Entrenadores / Coaches
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/clases}">
+                                <i class="bi bi-calendar-week-fill text-danger me-2"></i> Calendario de Clases
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
-                <!-- Enlace de Entrenadores (Admin y Staff) -->
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
-                    <a class="nav-link px-2 text-white" th:href="@{/entrenadores}">
-                        <i class="bi bi-person-badge-fill me-1 text-danger"></i> Entrenadores
+                <!-- ======================================================= -->
+                <!-- 2. VISTA EXCLUSIVA PARA ENTRENADORES (COACHES)         -->
+                <!-- ======================================================= -->
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_ENTRENADOR')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/seguimientos}">
+                        <i class="bi bi-heart-pulse-fill me-1 text-danger"></i> Progreso de Alumnos
                     </a>
                 </li>
-
-                <!-- Enlace de Progreso Fisico (Admin, Recepcion y Entrenadores) -->
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA', 'ROLE_ENTRENADOR')">
-                    <a class="nav-link px-2 text-white" th:href="@{/seguimientos}">
-                        <i class="bi bi-activity me-1 text-danger"></i> Progreso
-                    </a>
-                </li>
-
-                <!-- Enlace de Rutinas Deportivas -->
-                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA', 'ROLE_ENTRENADOR')">
-                    <a class="nav-link px-2 text-white" th:href="@{/rutinas}">
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_ENTRENADOR')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/rutinas}">
                         <i class="bi bi-journal-text me-1 text-danger"></i> Rutinas
                     </a>
                 </li>
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_ENTRENADOR')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/ejercicios}">
+                        <i class="bi bi-collection-play-fill me-1 text-danger"></i> Ejercicios
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_ENTRENADOR')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/clases}">
+                        <i class="bi bi-calendar-week-fill me-1 text-danger"></i> Mis Clases
+                    </a>
+                </li>
 
-                <!-- Enlace a Biblioteca Visual de Ejercicios (Abierto a todos) -->
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link px-2 text-white" th:href="@{/ejercicios}">
+                <!-- ======================================================= -->
+                <!-- 3. VISTA EXCLUSIVA PARA CLIENTES / SOCIOS              -->
+                <!-- ======================================================= -->
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_CLIENTE')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/portal/mi-cuenta}">
+                        <i class="bi bi-person-badge-fill me-1 text-danger"></i> Mi Carnet / QR
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_CLIENTE')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/clases}">
+                        <i class="bi bi-calendar-check-fill me-1 text-danger"></i> Reservar Clases
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_CLIENTE')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/ejercicios}">
                         <i class="bi bi-collection-play-fill me-1 text-danger"></i> Ejercicios
                     </a>
                 </li>
 
-                <!-- Enlace a Clases Grupales (Abierto a todos) -->
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link px-2 text-white" th:href="@{/clases}">
-                        <i class="bi bi-calendar-week-fill me-1 text-danger"></i> Clases
-                    </a>
-                </li>
-
-                <!-- Enlace directo al Portal del Socio -->
-                <li class="nav-item" sec:authorize="hasAuthority('ROLE_CLIENTE')">
-                    <a class="nav-link px-2 text-white" th:href="@{/portal/mi-cuenta}">
-                        <i class="bi bi-person-circle me-1 text-danger"></i> Mi Cuenta
-                    </a>
-                </li>
-
-                <!-- Usuario Autenticado y Logout -->
+                <!-- ======================================================= -->
+                <!-- 4. MENÚ DE USUARIO AUTENTICADO & LOGOUT                -->
+                <!-- ======================================================= -->
                 <li class="nav-item dropdown ms-lg-2" sec:authorize="isAuthenticated()">
-                    <a class="btn btn-sm btn-outline-light d-flex align-items-center gap-1 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle text-danger"></i>
-                        <span sec:authentication="name" class="fw-semibold">Usuario</span>
+                    <a class="btn btn-sm btn-outline-light d-flex align-items-center gap-1 dropdown-toggle px-3 py-1 shadow-sm" href="#" role="button" data-bs-toggle="dropdown" style="border-radius: 20px;">
+                        <i class="bi bi-person-circle text-danger fs-6"></i>
+                        <span sec:authentication="name" class="fw-bold text-white small">Usuario</span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow">
-                        <li class="px-3 py-1 text-muted small">
-                            Rol: <span class="badge bg-danger" sec:authentication="principal.authorities">ROL</span>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="border-radius: 12px;">
+                        <li class="px-3 py-2 bg-light border-bottom text-center">
+                            <div class="small text-muted">Sesión iniciada como:</div>
+                            <div class="fw-bold text-dark" sec:authentication="name">admin</div>
+                            <span class="badge bg-danger mt-1" sec:authentication="principal.authorities">ROL</span>
                         </li>
                         <li sec:authorize="hasAuthority('ROLE_ADMIN')">
-                            <a class="dropdown-item small" th:href="@{/usuarios}">
-                                <i class="bi bi-people-gear me-2"></i> Gestión de Usuarios
+                            <a class="dropdown-item py-2 small" th:href="@{/usuarios}">
+                                <i class="bi bi-people-gear text-danger me-2"></i> Gestión de Cuentas / Usuarios
                             </a>
                         </li>
                         <li sec:authorize="hasAuthority('ROLE_CLIENTE')">
-                            <a class="dropdown-item small" th:href="@{/portal/mi-cuenta}">
-                                <i class="bi bi-person-badge me-2"></i> Mi Portal de Socio
+                            <a class="dropdown-item py-2 small" th:href="@{/portal/mi-cuenta}">
+                                <i class="bi bi-person-badge text-danger me-2"></i> Mi Portal de Socio
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li><hr class="dropdown-divider my-1"></li>
                         <li>
-                            <form th:action="@{/logout}" method="post" class="px-2">
+                            <form th:action="@{/logout}" method="post" class="px-2 py-1">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                <button type="submit" class="dropdown-item text-danger small fw-semibold">
+                                <button type="submit" class="dropdown-item text-danger small fw-bold rounded-2">
                                     <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
                                 </button>
                             </form>
                         </li>
                     </ul>
                 </li>
+
             </ul>
         </div>
     </div>
