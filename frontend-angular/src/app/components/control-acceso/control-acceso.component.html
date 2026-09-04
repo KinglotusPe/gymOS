@@ -1,0 +1,183 @@
+<div class="container animate-fade-in">
+  <!-- Top Bar -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Torniquete & Control de Acceso</h1>
+      <p class="page-subtitle">Escaneo automático de código de barras DNI con auto-asignación de casillero y sincronización en la nube</p>
+    </div>
+    <div class="lockers-summary-pill">
+      <div class="locker-stat">
+        <span class="dot-free"></span>
+        <span>{{ resumen.lockersLibres }} Lockers Libres</span>
+      </div>
+      <div class="locker-divider"></div>
+      <div class="locker-stat">
+        <span class="dot-busy"></span>
+        <span>{{ resumen.lockersOcupados }} Ocupados</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scanner-layout">
+    <!-- Left Column: Scanner Station -->
+    <div class="scanner-column">
+      <!-- Input Card -->
+      <div class="glass-panel scanner-card">
+        <div class="scanner-header">
+          <i class="fa-solid fa-barcode scanner-big-icon"></i>
+          <div>
+            <h3>Terminal de Lectura de Códigos</h3>
+            <p>Pase el lector sobre el DNI o digite el número y presione Enter</p>
+          </div>
+        </div>
+
+        <div class="scan-input-group">
+          <input
+            #dniInput
+            type="text"
+            [(ngModel)]="dni"
+            (keyup.enter)="procesarEscaneo()"
+            [disabled]="cargando"
+            placeholder="Esperando lectura de código de barras..."
+            class="form-control scan-input"
+            autocomplete="off"
+          />
+          <button (click)="procesarEscaneo()" [disabled]="cargando || !dni" class="btn btn-primary btn-scan">
+            <i class="fa-solid fa-bolt" *ngIf="!cargando"></i>
+            <i class="fa-solid fa-spinner fa-spin" *ngIf="cargando"></i>
+            <span>Verificar</span>
+          </button>
+        </div>
+
+        <div class="scanner-tips">
+          <span><i class="fa-solid fa-keyboard"></i> El campo mantiene el foco automático.</span>
+          <span><i class="fa-solid fa-volume-high"></i> Alertas sonoras diferenciadas activas.</span>
+        </div>
+      </div>
+
+      <!-- Scan Result Visual Display -->
+      <div *ngIf="resultado" class="scan-result-card animate-fade-in" [ngClass]="{
+        'result-success': resultado.status === 'ACCESO_CONCEDIDO' || resultado.status === 'ENTRENADOR_ENTRADA',
+        'result-checkout': resultado.status === 'SALIDA' || resultado.status === 'ENTRENADOR_SALIDA',
+        'result-denied': resultado.status === 'MEMBRESIA_VENCIDA' || resultado.status === 'NO_REGISTRADO'
+      }">
+        <!-- Result Header Status -->
+        <div class="result-banner">
+          <div class="result-status-icon">
+            <i class="fa-solid fa-circle-check" *ngIf="resultado.status === 'ACCESO_CONCEDIDO'"></i>
+            <i class="fa-solid fa-arrow-right-from-bracket" *ngIf="resultado.status === 'SALIDA'"></i>
+            <i class="fa-solid fa-triangle-exclamation" *ngIf="resultado.status === 'MEMBRESIA_VENCIDA'"></i>
+            <i class="fa-solid fa-circle-xmark" *ngIf="resultado.status === 'NO_REGISTRADO'"></i>
+            <i class="fa-solid fa-user-shield" *ngIf="resultado.status === 'ENTRENADOR_ENTRADA' || resultado.status === 'ENTRENADOR_SALIDA'"></i>
+          </div>
+          <div>
+            <h2 class="result-title">
+              <span *ngIf="resultado.status === 'ACCESO_CONCEDIDO'">¡ACCESO CONCEDIDO!</span>
+              <span *ngIf="resultado.status === 'SALIDA'">¡SALIDA REGISTRADA!</span>
+              <span *ngIf="resultado.status === 'MEMBRESIA_VENCIDA'">¡MEMBRESÍA VENCIDA!</span>
+              <span *ngIf="resultado.status === 'NO_REGISTRADO'">¡DNI NO ENCONTRADO!</span>
+              <span *ngIf="resultado.status === 'ENTRENADOR_ENTRADA'">¡ENTRENADOR: TURNO INICIADO!</span>
+              <span *ngIf="resultado.status === 'ENTRENADOR_SALIDA'">¡ENTRENADOR: TURNO FINALIZADO!</span>
+            </h2>
+            <p class="result-subtitle">
+              <span *ngIf="resultado.status === 'ACCESO_CONCEDIDO'">Bienvenido al entrenamiento</span>
+              <span *ngIf="resultado.status === 'SALIDA'">Casillero liberado correctamente</span>
+              <span *ngIf="resultado.status === 'MEMBRESIA_VENCIDA'">Debe renovar su plan en recepción</span>
+              <span *ngIf="resultado.status === 'NO_REGISTRADO'">El DNI {{ resultado.dni }} no está afiliado</span>
+              <span *ngIf="resultado.status === 'ENTRENADOR_ENTRADA'">Marcaje laboral de ingreso confirmado</span>
+              <span *ngIf="resultado.status === 'ENTRENADOR_SALIDA'">Tiempo laborado: {{ resultado.tiempoTrabajado }}</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Result Member Profile -->
+        <div class="result-profile" *ngIf="resultado.nombreCompleto">
+          <img [src]="resultado.fotoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200'" alt="Foto" class="result-avatar">
+          <div class="profile-details">
+            <span class="profile-name">{{ resultado.nombreCompleto }}</span>
+            <div class="profile-tags">
+              <span class="badge badge-active" *ngIf="resultado.perfil === 'SOCIO'">Socio</span>
+              <span class="badge badge-locker" *ngIf="resultado.perfil === 'ENTRENADOR'">Staff Entrenador</span>
+              <span class="tag-dni">DNI: {{ resultado.dni }}</span>
+            </div>
+
+            <!-- Dynamic Locker Pill -->
+            <div class="locker-assigned-box" *ngIf="resultado.casilleroAsignado">
+              <i class="fa-solid fa-lock-open text-cyan"></i>
+              <div>
+                <span class="locker-label">Casillero Asignado:</span>
+                <strong class="locker-code">{{ resultado.casilleroAsignado }}</strong>
+              </div>
+            </div>
+
+            <div class="locker-assigned-box" *ngIf="resultado.casilleroLiberado">
+              <i class="fa-solid fa-lock text-green"></i>
+              <div>
+                <span class="locker-label">Casillero Liberado:</span>
+                <strong class="locker-code">{{ resultado.casilleroLiberado }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plan Info Footer -->
+        <div class="result-plan-bar" *ngIf="resultado.plan">
+          <div>
+            <span class="plan-sub">Plan de Membresía</span>
+            <strong class="plan-name">{{ resultado.plan }}</strong>
+          </div>
+          <div>
+            <span class="plan-sub">Vencimiento</span>
+            <strong class="plan-name">{{ resultado.fechaVencimiento }}</strong>
+          </div>
+          <div *ngIf="resultado.diasRestantes !== undefined">
+            <span class="plan-sub">Vigencia</span>
+            <span class="badge badge-active">{{ resultado.diasRestantes }} días restantes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Recent Scan Feed -->
+    <div class="feed-column">
+      <div class="glass-panel feed-card">
+        <div class="feed-header">
+          <div class="feed-title-wrap">
+            <i class="fa-solid fa-list-check text-cyan"></i>
+            <h4>Historial de Esta Sesión</h4>
+          </div>
+          <span class="badge badge-active">{{ historialMarcajes.length }}</span>
+        </div>
+
+        <div class="feed-list" *ngIf="historialMarcajes.length > 0; else noFeed">
+          <div class="feed-item" *ngFor="let item of historialMarcajes" [ngClass]="{
+            'feed-success': item.status === 'ACCESO_CONCEDIDO' || item.status === 'ENTRENADOR_ENTRADA',
+            'feed-checkout': item.status === 'SALIDA' || item.status === 'ENTRENADOR_SALIDA',
+            'feed-danger': item.status === 'MEMBRESIA_VENCIDA' || item.status === 'NO_REGISTRADO'
+          }">
+            <div class="feed-icon">
+              <i class="fa-solid fa-check" *ngIf="item.status === 'ACCESO_CONCEDIDO'"></i>
+              <i class="fa-solid fa-door-open" *ngIf="item.status === 'SALIDA'"></i>
+              <i class="fa-solid fa-xmark" *ngIf="item.status === 'MEMBRESIA_VENCIDA' || item.status === 'NO_REGISTRADO'"></i>
+              <i class="fa-solid fa-dumbbell" *ngIf="item.status === 'ENTRENADOR_ENTRADA' || item.status === 'ENTRENADOR_SALIDA'"></i>
+            </div>
+            <div class="feed-details">
+              <strong>{{ item.nombreCompleto || item.dni }}</strong>
+              <span>
+                {{ item.status === 'ACCESO_CONCEDIDO' ? 'Entrada (Locker ' + item.casilleroAsignado + ')' :
+                   item.status === 'SALIDA' ? 'Salida (Liberó ' + item.casilleroLiberado + ')' :
+                   item.status === 'MEMBRESIA_VENCIDA' ? 'Membresía Vencida' : 'No Registrado' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noFeed>
+          <div class="empty-state">
+            <p>Los marcajes escaneados aparecerán aquí en vivo.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

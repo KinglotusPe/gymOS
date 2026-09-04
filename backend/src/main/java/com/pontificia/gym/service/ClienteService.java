@@ -10,6 +10,7 @@ public interface ClienteService {
     Cliente buscarPorId(Long id);
     Optional<Cliente> buscarPorDni(String dni);
     List<Cliente> buscarPorNombreOApellido(String texto);
+    org.springframework.data.domain.Page<Cliente> listarPaginado(int pagina, int tamanio, String ordenarPor, String direccion, String buscar);
     Cliente guardar(Cliente cliente);
     void eliminar(Long id);
     long contarTotal();

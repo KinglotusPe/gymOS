@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              name="reporte_socios" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    <parameter name="FECHA_GENERACION" class="java.lang.String"/>
+    <parameter name="TOTAL_SOCIOS" class="java.lang.Long"/>
+
+    <field name="id" class="java.lang.Long"/>
+    <field name="dni" class="java.lang.String"/>
+    <field name="nombreCompleto" class="java.lang.String"/>
+    <field name="edad" class="java.lang.Integer"/>
+    <field name="telefono" class="java.lang.String"/>
+
+    <title>
+        <band height="80">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="55" backcolor="#111827"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="15" y="10" width="300" height="22" forecolor="#FFFFFF"/>
+                <textElement><font size="16" isBold="true"/></textElement>
+                <text><![CDATA[BRUTAL FITNESS — PADRÓN DE SOCIOS]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="15" y="32" width="300" height="15" forecolor="#EF4444"/>
+                <textElement><font size="9" isBold="true"/></textElement>
+                <text><![CDATA[REPORTE OFICIAL DE MIEMBROS ACTIVOS]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="350" y="15" width="190" height="15" forecolor="#D1D5DB"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Emitido: " + $P{FECHA_GENERACION}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="350" y="32" width="190" height="15" forecolor="#10B981"/>
+                <textElement textAlignment="Right"><font size="9" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA["Total Miembros: " + $P{TOTAL_SOCIOS}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="25">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="25" backcolor="#E5E7EB"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="10" y="5" width="40" height="15"/>
+                <textElement><font size="9" isBold="true"/></textElement>
+                <text><![CDATA[ID]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="60" y="5" width="80" height="15"/>
+                <textElement><font size="9" isBold="true"/></textElement>
+                <text><![CDATA[DNI]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="150" y="5" width="220" height="15"/>
+                <textElement><font size="9" isBold="true"/></textElement>
+                <text><![CDATA[APELLIDOS Y NOMBRES]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="380" y="5" width="60" height="15"/>
+                <textElement textAlignment="Center"><font size="9" isBold="true"/></textElement>
+                <text><![CDATA[EDAD]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="450" y="5" width="95" height="15"/>
+                <textElement textAlignment="Right"><font size="9" isBold="true"/></textElement>
+                <text><![CDATA[TELÉFONO]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="22">
+            <textField>
+                <reportElement x="10" y="3" width="40" height="15"/>
+                <textElement><font size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="60" y="3" width="80" height="15"/>
+                <textElement><font size="9" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{dni}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="150" y="3" width="220" height="15"/>
+                <textElement><font size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{nombreCompleto}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="380" y="3" width="60" height="15"/>
+                <textElement textAlignment="Center"><font size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{edad} + " años"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="450" y="3" width="95" height="15"/>
+                <textElement textAlignment="Right"><font size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{telefono} != null ? $F{telefono} : "-"]]></textFieldExpression>
+            </textField>
+            <line>
+                <reportElement x="0" y="20" width="555" height="1" forecolor="#F3F4F6"/>
+            </line>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="25">
+            <textField>
+                <reportElement x="0" y="5" width="200" height="15" forecolor="#9CA3AF"/>
+                <textElement><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Brutal Fitness — Sistema de Gestión Web"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="355" y="5" width="190" height="15" forecolor="#9CA3AF"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>

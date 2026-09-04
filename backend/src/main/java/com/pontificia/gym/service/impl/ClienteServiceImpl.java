@@ -48,6 +48,20 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<Cliente> listarPaginado(int pagina, int tamanio, String ordenarPor, String direccion, String buscar) {
+        org.springframework.data.domain.Sort sort = direccion.equalsIgnoreCase("desc") ? 
+                org.springframework.data.domain.Sort.by(ordenarPor).descending() : 
+                org.springframework.data.domain.Sort.by(ordenarPor).ascending();
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(Math.max(0, pagina), tamanio, sort);
+
+        if (buscar != null && !buscar.trim().isEmpty()) {
+            return clienteRepository.findByNombresContainingIgnoreCaseOrApellidosContainingIgnoreCase(buscar.trim(), buscar.trim(), pageable);
+        }
+        return clienteRepository.findAll(pageable);
+    }
+
+    @Override
     public Cliente guardar(Cliente cliente) {
         if (cliente.getFechaInscripcion() == null) {
             cliente.setFechaInscripcion(LocalDate.now());

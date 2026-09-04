@@ -10,9 +10,14 @@
             <h1 class="h3 fw-bold text-dark mb-0">Gestión de Clientes y Socios</h1>
             <p class="text-secondary small mb-0">Listado, registro y contacto directo de miembros</p>
         </div>
-        <a th:href="@{/clientes/nuevo}" class="btn btn-danger fw-bold shadow-sm">
-            <i class="bi bi-person-plus-fill me-1"></i> + Nuevo Cliente
-        </a>
+        <div class="d-flex gap-2">
+            <a th:href="@{/reportes/socios}" target="_blank" class="btn btn-outline-danger fw-bold shadow-sm">
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Padrón PDF (Jasper)
+            </a>
+            <a th:href="@{/clientes/nuevo}" class="btn btn-danger fw-bold shadow-sm">
+                <i class="bi bi-person-plus-fill me-1"></i> + Nuevo Cliente
+            </a>
+        </div>
     </div>
 
     <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -89,6 +94,30 @@
                     </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Controles de Paginación y Ordenamiento -->
+            <div class="card-footer bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2" th:if="${totalPaginas > 1}">
+                <div class="small text-muted">
+                    Mostrando página <strong th:text="${paginaActual + 1}">1</strong> de <strong th:text="${totalPaginas}">1</strong> (<span th:text="${totalElementos}">10</span> socios en total)
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" th:classappend="${paginaActual == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/clientes(pagina=${paginaActual - 1}, buscar=${buscar}, ordenarPor=${ordenarPor}, direccion=${direccion})}">
+                                <i class="bi bi-chevron-left"></i> Anterior
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}" th:classappend="${i == paginaActual} ? 'active'">
+                            <a class="page-link" th:href="@{/clientes(pagina=${i}, buscar=${buscar}, ordenarPor=${ordenarPor}, direccion=${direccion})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${paginaActual + 1 >= totalPaginas} ? 'disabled'">
+                            <a class="page-link" th:href="@{/clientes(pagina=${paginaActual + 1}, buscar=${buscar}, ordenarPor=${ordenarPor}, direccion=${direccion})}">
+                                Siguiente <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>

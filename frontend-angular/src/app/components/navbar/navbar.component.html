@@ -1,0 +1,47 @@
+<header class="navbar-header">
+  <div class="navbar-container">
+    <!-- Brand Logo -->
+    <a routerLink="/dashboard" class="brand-link">
+      <div class="brand-icon">
+        <i class="fa-solid fa-dumbbell"></i>
+      </div>
+      <div class="brand-info">
+        <span class="brand-title">BRUTAL FITNESS</span>
+        <span class="brand-badge">ANGULAR 17 SPA</span>
+      </div>
+    </a>
+
+    <!-- Navigation Links -->
+    <nav class="nav-menu">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/clientes" routerLinkActive="active" class="nav-item">
+        <i class="fa-solid fa-users"></i>
+        <span>Socios (Paginación)</span>
+      </a>
+      <a routerLink="/control-acceso" routerLinkActive="active" class="nav-item">
+        <i class="fa-solid fa-barcode"></i>
+        <span>Control Acceso & DNI</span>
+      </a>
+    </nav>
+
+    <!-- Right Stats & Actions -->
+    <div class="navbar-right">
+      <div class="cloud-pill">
+        <span class="cloud-dot"></span>
+        <i class="fa-brands fa-google"></i>
+        <span>Firebase Cloud Sync</span>
+      </div>
+      <div class="clock-badge">
+        <i class="fa-regular fa-clock"></i>
+        <span>{{ horaActual }}</span>
+      </div>
+      <a href="http://localhost:8080/" target="_blank" class="btn btn-secondary btn-sm" title="Ir al Panel Spring Boot MVC">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span>Spring Boot</span>
+      </a>
+    </div>
+  </div>
+</header>

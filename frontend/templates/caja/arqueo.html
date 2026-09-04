@@ -18,7 +18,11 @@
             <div class="d-flex gap-2">
                 <a th:href="@{/caja/exportar-excel(fechaInicio=${fechaInicio}, fechaFin=${fechaFin}, cajero=${cajeroSeleccionado})}" 
                    class="btn btn-success fw-bold shadow-sm">
-                    <i class="bi bi-file-earmark-excel-fill me-1"></i> Descargar Reporte Excel (.xlsx)
+                    <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel (.xlsx)
+                </a>
+                <a th:href="@{/reportes/caja(inicio=${fechaInicio}, fin=${fechaFin})}" target="_blank"
+                   class="btn btn-danger fw-bold shadow-sm">
+                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF (JasperReports)
                 </a>
             </div>
         </div>

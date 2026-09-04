@@ -19,5 +19,8 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     List<Cliente> findByNombresContainingIgnoreCaseOrApellidosContainingIgnoreCase(
             String nombres, String apellidos);
 
+    org.springframework.data.domain.Page<Cliente> findByNombresContainingIgnoreCaseOrApellidosContainingIgnoreCase(
+            String nombres, String apellidos, org.springframework.data.domain.Pageable pageable);
+
     boolean existsByDni(String dni);
 }

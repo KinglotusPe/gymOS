@@ -1,0 +1,187 @@
+<div class="container animate-fade-in">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Gestión de Socios (Clientes)</h1>
+      <p class="page-subtitle">
+        Demostración de <strong>Spring Data JPA Paginación (<code>Pageable</code>)</strong> y <strong>Ordenamiento (<code>Sort</code>)</strong> consumido vía REST
+      </p>
+    </div>
+    <div class="header-actions">
+      <a href="http://localhost:8080/reportes/socios" target="_blank" class="btn btn-secondary" title="Descargar Padrón Oficial en PDF">
+        <i class="fa-solid fa-file-pdf text-rose"></i>
+        <span>Descargar PDF (JasperReports)</span>
+      </a>
+      <button (click)="abrirModal()" class="btn btn-primary">
+        <i class="fa-solid fa-user-plus"></i>
+        <span>Nuevo Socio</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search and Filters Bar -->
+  <div class="glass-panel filter-bar">
+    <div class="search-input-wrap">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input
+        type="text"
+        [(ngModel)]="buscar"
+        (keyup.enter)="buscarSocios()"
+        placeholder="Buscar por DNI, nombres o apellidos..."
+        class="form-control search-input"
+      />
+    </div>
+    <button (click)="buscarSocios()" class="btn btn-secondary">
+      <i class="fa-solid fa-filter"></i>
+      <span>Filtrar</span>
+    </button>
+    <div class="page-size-select">
+      <span>Filas:</span>
+      <select [(ngModel)]="tamanio" (change)="buscarSocios()" class="form-control select-compact">
+        <option [value]="5">5</option>
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Members Table -->
+  <div class="glass-panel table-panel">
+    <div class="table-responsive">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th (click)="cambiarOrden('id')" class="sortable-th">
+              ID
+              <i class="fa-solid" [ngClass]="{'fa-sort-up': ordenarPor === 'id' && direccion === 'asc', 'fa-sort-down': ordenarPor === 'id' && direccion === 'desc', 'fa-sort': ordenarPor !== 'id'}"></i>
+            </th>
+            <th>Foto</th>
+            <th (click)="cambiarOrden('nombres')" class="sortable-th">
+              Nombres y Apellidos
+              <i class="fa-solid" [ngClass]="{'fa-sort-up': ordenarPor === 'nombres' && direccion === 'asc', 'fa-sort-down': ordenarPor === 'nombres' && direccion === 'desc', 'fa-sort': ordenarPor !== 'nombres'}"></i>
+            </th>
+            <th (click)="cambiarOrden('dni')" class="sortable-th">
+              DNI (Código de Barras)
+              <i class="fa-solid" [ngClass]="{'fa-sort-up': ordenarPor === 'dni' && direccion === 'asc', 'fa-sort-down': ordenarPor === 'dni' && direccion === 'desc', 'fa-sort': ordenarPor !== 'dni'}"></i>
+            </th>
+            <th>Edad</th>
+            <th>Teléfono</th>
+            <th>Fecha Inscripción</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of paginaData.content">
+            <td><span class="id-badge">#{{ c.id }}</span></td>
+            <td>
+              <img [src]="c.fotoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'" alt="Foto" class="avatar-sm">
+            </td>
+            <td>
+              <strong class="text-white">{{ c.nombres }} {{ c.apellidos }}</strong>
+            </td>
+            <td>
+              <span class="barcode-pill">
+                <i class="fa-solid fa-barcode"></i> {{ c.dni }}
+              </span>
+            </td>
+            <td>{{ c.edad }} años</td>
+            <td>{{ c.telefono || '—' }}</td>
+            <td>{{ c.fechaInscripcion || '—' }}</td>
+            <td class="text-right">
+              <button (click)="eliminarSocio(c.id)" class="btn-action-danger" title="Eliminar Socio">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="paginaData.content.length === 0 && !cargando">
+            <td colspan="8" class="text-center py-4">No se encontraron socios registrados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-footer">
+      <span class="pagination-info">
+        Mostrando {{ paginaData.content.length }} de {{ paginaData.totalElements }} socios
+        (Página {{ paginaData.number + 1 }} de {{ paginaData.totalPages }})
+      </span>
+
+      <div class="pagination-nav">
+        <button
+          (click)="irAPagina(pagina - 1)"
+          [disabled]="paginaData.first"
+          class="btn btn-secondary btn-sm"
+        >
+          <i class="fa-solid fa-chevron-left"></i> Anterior
+        </button>
+
+        <span class="current-page-num">{{ pagina + 1 }}</span>
+
+        <button
+          (click)="irAPagina(pagina + 1)"
+          [disabled]="paginaData.last"
+          class="btn btn-secondary btn-sm"
+        >
+          Siguiente <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nuevo Socio -->
+<div class="modal-backdrop" *ngIf="modalAbierto">
+  <div class="glass-panel modal-card animate-fade-in">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <i class="fa-solid fa-user-plus text-cyan"></i>
+        <h3>Inscribir Nuevo Socio</h3>
+      </div>
+      <button (click)="cerrarModal()" class="close-btn">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="alert alert-danger" *ngIf="mensajeError">
+        <i class="fa-solid fa-triangle-exclamation"></i> {{ mensajeError }}
+      </div>
+      <div class="alert alert-success" *ngIf="mensajeExito">
+        <i class="fa-solid fa-circle-check"></i> {{ mensajeExito }}
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>DNI / Código de Barra *</label>
+          <input type="text" [(ngModel)]="nuevoSocio.dni" maxlength="12" class="form-control" placeholder="Ej: 72345678">
+        </div>
+        <div class="form-group">
+          <label>Edad</label>
+          <input type="number" [(ngModel)]="nuevoSocio.edad" min="12" max="90" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Nombres *</label>
+          <input type="text" [(ngModel)]="nuevoSocio.nombres" class="form-control" placeholder="Nombres">
+        </div>
+        <div class="form-group">
+          <label>Apellidos *</label>
+          <input type="text" [(ngModel)]="nuevoSocio.apellidos" class="form-control" placeholder="Apellidos">
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="text" [(ngModel)]="nuevoSocio.telefono" class="form-control" placeholder="Ej: 987654321">
+        </div>
+        <div class="form-group">
+          <label>URL Foto (Opcional)</label>
+          <input type="text" [(ngModel)]="nuevoSocio.fotoUrl" class="form-control" placeholder="https://...">
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="cerrarModal()" class="btn btn-secondary">Cancelar</button>
+      <button (click)="guardarSocio()" class="btn btn-primary">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar Socio
+      </button>
+    </div>
+  </div>
+</div>

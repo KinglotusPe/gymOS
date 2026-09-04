@@ -20,9 +20,21 @@ public class ClienteController {
     }
 
     @GetMapping
-    public String listar(@RequestParam(value = "buscar", required = false) String buscar, Model model) {
-        model.addAttribute("clientes", clienteService.buscarPorNombreOApellido(buscar));
-        model.addAttribute("buscar", buscar);
+    public String listar(@RequestParam(value = "buscar", required = false) String buscar,
+                         @RequestParam(value = "pagina", defaultValue = "0") int pagina,
+                         @RequestParam(value = "tamanio", defaultValue = "8") int tamanio,
+                         @RequestParam(value = "ordenarPor", defaultValue = "id") String ordenarPor,
+                         @RequestParam(value = "direccion", defaultValue = "desc") String direccion,
+                         Model model) {
+        org.springframework.data.domain.Page<Cliente> clientesPage = clienteService.listarPaginado(pagina, tamanio, ordenarPor, direccion, buscar);
+        model.addAttribute("clientes", clientesPage.getContent());
+        model.addAttribute("clientesPage", clientesPage);
+        model.addAttribute("paginaActual", pagina);
+        model.addAttribute("totalPaginas", clientesPage.getTotalPages());
+        model.addAttribute("totalElementos", clientesPage.getTotalElements());
+        model.addAttribute("ordenarPor", ordenarPor);
+        model.addAttribute("direccion", direccion);
+        model.addAttribute("buscar", buscar != null ? buscar : "");
         return "clientes/list";
     }
 

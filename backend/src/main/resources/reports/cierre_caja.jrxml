@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              name="cierre_caja" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    <parameter name="FECHA_INICIO" class="java.lang.String"/>
+    <parameter name="FECHA_FIN" class="java.lang.String"/>
+    <parameter name="TOTAL_INGRESOS" class="java.math.BigDecimal"/>
+    <parameter name="TOTAL_MEMBRESIAS" class="java.math.BigDecimal"/>
+    <parameter name="TOTAL_TIENDA" class="java.math.BigDecimal"/>
+    <parameter name="TOTAL_EFECTIVO" class="java.math.BigDecimal"/>
+    <parameter name="TOTAL_DIGITAL" class="java.math.BigDecimal"/>
+
+    <title>
+        <band height="140">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="60" backcolor="#111827"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="15" y="10" width="350" height="24" forecolor="#FFFFFF"/>
+                <textElement><font size="16" isBold="true"/></textElement>
+                <text><![CDATA[BRUTAL FITNESS — ARQUEO DE CAJA]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="15" y="34" width="350" height="15" forecolor="#EF4444"/>
+                <textElement><font size="9" isBold="true"/></textElement>
+                <text><![CDATA[AUDITORÍA FINANCIERA Y BALANCE DE OPERACIONES]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="370" y="15" width="170" height="15" forecolor="#D1D5DB"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Desde: " + $P{FECHA_INICIO}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="370" y="32" width="170" height="15" forecolor="#D1D5DB"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Hasta: " + $P{FECHA_FIN}]]></textFieldExpression>
+            </textField>
+
+            <rectangle>
+                <reportElement x="0" y="75" width="175" height="50" backcolor="#F3F4F6"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="10" y="82" width="155" height="15" forecolor="#4B5563"/>
+                <textElement><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[CUOTAS Y MEMBRESÍAS]]></text>
+            </staticText>
+            <textField pattern="S/ #,##0.00">
+                <reportElement x="10" y="98" width="155" height="20" forecolor="#1F2937"/>
+                <textElement><font size="12" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TOTAL_MEMBRESIAS}]]></textFieldExpression>
+            </textField>
+
+            <rectangle>
+                <reportElement x="190" y="75" width="175" height="50" backcolor="#F3F4F6"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="200" y="82" width="155" height="15" forecolor="#4B5563"/>
+                <textElement><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[TIENDA Y SUPLEMENTOS]]></text>
+            </staticText>
+            <textField pattern="S/ #,##0.00">
+                <reportElement x="200" y="98" width="155" height="20" forecolor="#1F2937"/>
+                <textElement><font size="12" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TOTAL_TIENDA}]]></textFieldExpression>
+            </textField>
+
+            <rectangle>
+                <reportElement x="380" y="75" width="175" height="50" backcolor="#DC2626"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="390" y="82" width="155" height="15" forecolor="#FFFFFF"/>
+                <textElement><font size="8" isBold="true"/></textElement>
+                <text><![CDATA[TOTAL GENERAL EN CAJA]]></text>
+            </staticText>
+            <textField pattern="S/ #,##0.00">
+                <reportElement x="390" y="98" width="155" height="20" forecolor="#FFFFFF"/>
+                <textElement><font size="14" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TOTAL_INGRESOS}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <summary>
+        <band height="100">
+            <rectangle>
+                <reportElement x="0" y="10" width="555" height="40" backcolor="#F9FAFB"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="15" y="20" width="150" height="20"/>
+                <textElement><font size="10" isBold="true"/></textElement>
+                <text><![CDATA[Efectivo Físico en Caja:]]></text>
+            </staticText>
+            <textField pattern="S/ #,##0.00">
+                <reportElement x="165" y="20" width="110" height="20" forecolor="#16A34A"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TOTAL_EFECTIVO}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="290" y="20" width="140" height="20"/>
+                <textElement><font size="10" isBold="true"/></textElement>
+                <text><![CDATA[Digital (Yape / Plin / Card):]]></text>
+            </staticText>
+            <textField pattern="S/ #,##0.00">
+                <reportElement x="435" y="20" width="110" height="20" forecolor="#2563EB"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TOTAL_DIGITAL}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="0" y="70" width="555" height="20" forecolor="#9CA3AF"/>
+                <textElement textAlignment="Center"><font size="8"/></textElement>
+                <text><![CDATA[Reporte Oficial de Auditoría emitido por el Sistema de Gestión Brutal Fitness.]]></text>
+            </staticText>
+        </band>
+    </summary>
+</jasperReport>

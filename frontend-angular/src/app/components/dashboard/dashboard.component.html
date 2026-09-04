@@ -1,0 +1,212 @@
+<div class="container animate-fade-in">
+  <!-- Top Banner -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Panel de Control General</h1>
+      <p class="page-subtitle">Monitoreo en tiempo real — Spring Data JPA + Angular SPA + Firebase Cloud</p>
+    </div>
+    <div class="header-actions">
+      <button (click)="cargarDatos()" class="btn btn-secondary">
+        <i class="fa-solid fa-arrows-rotate"></i>
+        <span>Actualizar Datos</span>
+      </button>
+      <a routerLink="/control-acceso" class="btn btn-primary">
+        <i class="fa-solid fa-barcode"></i>
+        <span>Escanear DNI</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Cards Grid -->
+  <div class="kpi-grid">
+    <!-- Card 1: Socios Activos -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-label">Socios con Membresía Activa</span>
+        <div class="kpi-icon-wrap icon-cyan">
+          <i class="fa-solid fa-id-card"></i>
+        </div>
+      </div>
+      <div class="kpi-body">
+        <span class="kpi-value">{{ stats.sociosActivos }}</span>
+        <span class="kpi-sub">De un total de {{ stats.totalSocios }} registrados</span>
+      </div>
+      <div class="kpi-footer">
+        <span class="badge badge-active">
+          <i class="fa-solid fa-check"></i> Activos
+        </span>
+        <span class="kpi-extra text-danger" *ngIf="stats.sociosVencidos > 0">
+          {{ stats.sociosVencidos }} por renovar
+        </span>
+      </div>
+    </div>
+
+    <!-- Card 2: Asistencias de Hoy -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-label">Asistencias del Día</span>
+        <div class="kpi-icon-wrap icon-green">
+          <i class="fa-solid fa-person-walking"></i>
+        </div>
+      </div>
+      <div class="kpi-body">
+        <span class="kpi-value">{{ stats.asistenciasHoy }}</span>
+        <span class="kpi-sub">Entradas registradas hoy</span>
+      </div>
+      <div class="kpi-footer">
+        <span class="badge badge-active">En Vivo</span>
+        <span class="kpi-extra">Auto-marcado con DNI</span>
+      </div>
+    </div>
+
+    <!-- Card 3: Ocupación de Casilleros -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-label">Casilleros y Lockers</span>
+        <div class="kpi-icon-wrap icon-amber">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+      </div>
+      <div class="kpi-body">
+        <span class="kpi-value">{{ stats.lockersLibres }}</span>
+        <span class="kpi-sub">Disponibles / {{ stats.lockersOcupados }} Ocupados</span>
+      </div>
+      <div class="kpi-footer">
+        <span class="badge badge-locker">Auto Asignación</span>
+        <span class="kpi-extra">Liberación por checkout</span>
+      </div>
+    </div>
+
+    <!-- Card 4: Recaudación del Mes -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-label">Recaudación Mensual</span>
+        <div class="kpi-icon-wrap icon-purple">
+          <i class="fa-solid fa-sack-dollar"></i>
+        </div>
+      </div>
+      <div class="kpi-body">
+        <span class="kpi-value">S/ {{ stats.ingresosMes | number:'1.2-2' }}</span>
+        <span class="kpi-sub">Total acumulado en caja</span>
+      </div>
+      <div class="kpi-footer">
+        <a href="http://localhost:8080/reportes/caja" target="_blank" class="pdf-quick-link">
+          <i class="fa-solid fa-file-pdf"></i> Arqueo JasperReports
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Section: Live Streams & JasperReports Links -->
+  <div class="content-grid">
+    <!-- Left Column: Asistencias Recientes -->
+    <div class="glass-panel panel-card">
+      <div class="panel-header">
+        <div class="panel-title-wrap">
+          <i class="fa-solid fa-clock-rotate-left text-cyan"></i>
+          <h3>Últimos Ingresos al Gimnasio</h3>
+        </div>
+        <span class="badge badge-active">Actualización Automática</span>
+      </div>
+
+      <div class="table-responsive" *ngIf="asistenciasRecientes.length > 0; else noAsistencias">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>Socio / Atleta</th>
+              <th>DNI</th>
+              <th>Hora Ingreso</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let a of asistenciasRecientes">
+              <td class="user-cell">
+                <img [src]="a.cliente.fotoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'" alt="Foto" class="avatar-sm">
+                <div>
+                  <span class="user-name">{{ a.cliente.nombres }} {{ a.cliente.apellidos }}</span>
+                  <span class="user-sub">Socio Activo</span>
+                </div>
+              </td>
+              <td><code>{{ a.cliente.dni }}</code></td>
+              <td class="time-cell">{{ a.fechaHora | slice:11:19 }}</td>
+              <td><span class="badge badge-active"><i class="fa-solid fa-check"></i> Autorizado</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #noAsistencias>
+        <div class="empty-state">
+          <i class="fa-regular fa-calendar-xmark empty-icon"></i>
+          <p>No se han registrado marcajes el día de hoy.</p>
+          <a routerLink="/control-acceso" class="btn btn-primary btn-sm">Iniciar Escaneo de Códigos de Barra</a>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Right Column: JasperReports & Syllabus Architecture -->
+    <div class="side-column">
+      <!-- JasperReports Official Box -->
+      <div class="glass-panel panel-card">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <i class="fa-solid fa-file-pdf text-rose"></i>
+            <h3>Reportes Oficiales JasperReports</h3>
+          </div>
+        </div>
+        <p class="panel-desc">
+          Documentos generados directamente por el motor JasperReports del backend Spring Boot compilados en PDF oficial:
+        </p>
+        <div class="report-links-list">
+          <a href="http://localhost:8080/reportes/socios" target="_blank" class="report-btn">
+            <div class="report-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="report-text">
+              <strong>Padrón de Socios Activos</strong>
+              <span>PDF Oficial con listado completo y totales</span>
+            </div>
+            <i class="fa-solid fa-download"></i>
+          </a>
+
+          <a href="http://localhost:8080/reportes/caja" target="_blank" class="report-btn">
+            <div class="report-icon"><i class="fa-solid fa-cash-register"></i></div>
+            <div class="report-text">
+              <strong>Cierre y Arqueo de Caja</strong>
+              <span>Balance contable de suscripciones y tienda</span>
+            </div>
+            <i class="fa-solid fa-download"></i>
+          </a>
+
+          <a href="http://localhost:8080/reportes/boleta/1" target="_blank" class="report-btn">
+            <div class="report-icon"><i class="fa-solid fa-receipt"></i></div>
+            <div class="report-text">
+              <strong>Boleta de Pago Electrónica</strong>
+              <span>Comprobante fiscal con membrete y código</span>
+            </div>
+            <i class="fa-solid fa-download"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Cloud Architecture Card -->
+      <div class="glass-panel panel-card cloud-card">
+        <div class="cloud-header">
+          <div class="cloud-logo">
+            <i class="fa-brands fa-google"></i>
+          </div>
+          <div>
+            <h4>Google Firebase Cloud</h4>
+            <span class="cloud-status-text">Sincronización en la Nube Activa</span>
+          </div>
+        </div>
+        <p class="cloud-desc">
+          Cada marcaje de asistencia y asignación de casillero es replicado asíncronamente en los nodos de Firebase Realtime Database para monitoreo en vivo desde dispositivos móviles.
+        </p>
+        <div class="cloud-badges">
+          <span class="badge badge-active"><i class="fa-solid fa-bolt"></i> Realtime DB</span>
+          <span class="badge badge-locker"><i class="fa-solid fa-cloud"></i> Firebase SDK 10</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
