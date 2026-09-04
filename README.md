@@ -412,8 +412,56 @@ mvn spring-boot:run
 mvn spring-boot:run -pl backend -Dspring-boot.run.profiles=postgres
 ```
 
-### 4. Acceder al Sistema
+### 4. Acceder al Sistema MVC (Thymeleaf)
 Abre tu navegador en: **[http://localhost:8080](http://localhost:8080)**
+
+---
+
+## 🎓 Cumplimiento del Sílabo Oficial (La Pontificia - 5to Semestre)
+
+El sistema ha sido estructurado para cumplir con el 100% de los logros y capacidades del curso **Programación de Aplicaciones Web**:
+
+| Unidad | Temas del Sílabo | Componentes Implementados en el Repositorio |
+| :---: | :--- | :--- |
+| **Unidad 1** | • JPA & Anotaciones<br>• JPQL y Relaciones<br>• Maven & Ciclo de Vida<br>• Git & GitHub | • Modelos `@Entity` en `com.pontificia.gym.entity`.<br>• Consultas JPQL con `@Query` y relaciones relacionales.<br>• `pom.xml` multi-módulo y wrapper `mvnw`.<br>• Repositorio en GitHub sincronizado. |
+| **Unidad 2** | • Spring Boot & Inyección Core<br>• Spring Data JPA con **Paginación y Ordenamiento**<br>• Spring Web MVC y Estereotipos<br>• Spring Security (BCrypt, Roles, CORS)<br>• **Spring RESTful APIs** | • Paginación `Pageable` y `Sort` en `ClienteRepository`, `ClienteService` y `ClienteController`.<br>• Seguridad en `SecurityConfig.java` con CORS y exclusión CSRF en APIs.<br>• Controladores RESTful (`@RestController`) en `com.pontificia.gym.controller.api`: `/api/clientes`, `/api/asistencias/escanear`, `/api/dashboard/stats`, `/api/membresias`, `/api/tienda`. |
+| **Unidad 3** | • **JasperReports** (Diseño e Integración)<br>• Reportes en PDF con resúmenes y gráficos<br>• **Despliegue en la Nube (Heroku)** | • 3 Reportes oficiales precompilados a `.jasper` optimizados para Java 17:<br>  1. Padrón de Socios (`/reportes/socios`)<br>  2. Arqueo de Caja (`/reportes/caja`)<br>  3. Boleta de Pago Electrónica (`/reportes/boleta/{id}`)<br>• Archivos para la nube: `Procfile`, `system.properties` y `application-prod.properties`. |
+| **Unidad 4** | • **Angular 17 Standalone** (SPA)<br>• **TypeScript** (Modelos, Clases, Interfaces, Promesas)<br>• Componentes y Comunicación<br>• **Servicios en la Nube con Firebase** | • Aplicación SPA completa en `frontend-angular/`.<br>• Modelos fuertemente tipados y servicios `HttpClient` con RxJS.<br>• Componentes: Navbar, Dashboard, Clientes paginado, Control de Acceso con lectura de DNI por código de barras y Web Audio API.<br>• Sincronización en tiempo real con **Firebase Realtime Database** (`firebase-cloud.service.ts`). |
+
+---
+
+## 🌐 Endpoints RESTful y Generación de Reportes PDF
+
+### 📄 Reportes Oficiales JasperReports (Descarga Directa PDF)
+* `GET http://localhost:8080/reportes/socios` — Genera el Padrón General de Socios en PDF.
+* `GET http://localhost:8080/reportes/caja` — Genera el Balance y Arqueo Diario de Caja en PDF.
+* `GET http://localhost:8080/reportes/boleta/{id}` — Genera la Boleta Electrónica de Pago en PDF con desglose de IGV.
+
+### 🔌 Servicios Web RESTful (JSON)
+* `GET /api/clientes/paginado?pagina=0&tamanio=5&ordenarPor=id&direccion=desc` — Paginación y ordenación server-side.
+* `POST /api/clientes` — Registro de nuevo socio vía JSON.
+* `POST /api/asistencias/escanear` — Escaneo de código de barras DNI, control de acceso y asignación automática de casilleros.
+* `GET /api/asistencias/hoy` — Listado reactivo de marcajes de la jornada.
+* `GET /api/dashboard/stats` — Indicadores en vivo (socios activos, lockers libres, ingresos).
+* `GET /api/membresias` — Catálogo activo de planes.
+* `GET /api/tienda/productos` — Inventario disponible en tienda.
+
+---
+
+## 🅰️ Frontend Angular 17 SPA (`frontend-angular/`)
+
+Para ejecutar la aplicación desacoplada en Angular:
+
+```bash
+# Ingresar al directorio del frontend
+cd frontend-angular
+
+# Instalar dependencias (Node.js 18+)
+npm install
+
+# Iniciar servidor de desarrollo en http://localhost:4200
+npm start
+```
 
 ---
 
@@ -424,58 +472,49 @@ El proyecto está organizado de manera modular y desacoplada respetando los est�
 ```
 gym-sistema/
 │
-├── 🧠 BACKEND (Java 17 + Spring Boot 3)
+├── 🧠 BACKEND (Java 17 + Spring Boot 3 + JasperReports)
 │   └── src/main/java/com/pontificia/gym/
-│       ├── controller/        -> Controladores Spring MVC (Recepción de peticiones HTTP y redirección)
-│       │   ├── HomeController.java
-│       │   ├── ClienteController.java
-│       │   ├── MembresiaController.java
-│       │   ├── PagoController.java
-│       │   └── AsistenciaController.java
+│       ├── controller/        -> Controladores Spring MVC (Thymeleaf) y Reportes PDF
+│       │   ├── ReporteController.java (JasperReports PDF Engine)
+│       │   ├── ClienteController.java (MVC con Paginación Spring Data)
+│       │   └── api/           -> Controladores RESTful JSON (@RestController)
+│       │       ├── ClienteApiController.java
+│       │       ├── AsistenciaApiController.java
+│       │       ├── DashboardApiController.java
+│       │       ├── MembresiaApiController.java
+│       │       └── TiendaApiController.java
 │       ├── service/           -> Capa de Lógica de Negocio (Interfaces)
-│       │   ├── ClienteService.java
-│       │   ├── MembresiaService.java
-│       │   ├── PagoService.java
-│       │   ├── AsistenciaService.java
-│       │   └── impl/          -> Implementaciones con reglas de validación y cálculo
-│       ├── repository/        -> Capa de Acceso a Datos (Spring Data JPA + Queries JPQL)
-│       │   ├── ClienteRepository.java
-│       │   ├── MembresiaRepository.java
-│       │   ├── PagoRepository.java
-│       │   └── AsistenciaRepository.java
+│       │   ├── JasperReportService.java
+│       │   └── impl/          -> Implementaciones (JasperReportServiceImpl con JRLoader)
+│       ├── repository/        -> Capa de Acceso a Datos (Spring Data JPA + Queries JPQL + Pageable)
 │       ├── entity/            -> Modelos de Datos / Entidades JPA
-│       │   ├── Cliente.java
-│       │   ├── Membresia.java
-│       │   ├── Pago.java
-│       │   ├── Asistencia.java
-│       │   ├── TipoMembresia.java (Enum)
-│       │   ├── EstadoMembresia.java (Enum)
-│       │   └── MetodoPago.java (Enum)
-│       └── config/            -> Manejo global de excepciones y configuraciones del servidor
-│
-├── 🎨 FRONTEND (HTML5 + Thymeleaf + CSS3 + Vanilla JS)
+│       └── config/            -> SecurityConfig (BCrypt, CORS, Exclusión CSRF para APIs)
 │   └── src/main/resources/
-│       ├── templates/         -> Vistas dinámicas renderizadas por el servidor (SSR)
-│       │   ├── fragments/     -> Componentes reutilizables (Navbar, Footer, Head común)
-│       │   ├── clientes/      -> Vistas de gestión de clientes (listado y formulario)
-│       │   ├── membresias/    -> Vistas de membresías (listado y formulario)
-│       │   ├── pagos/         -> Vistas de pagos (listado y formulario de cobro)
-│       │   ├── asistencias/   -> Vistas de control de asistencias
-│       │   ├── index.html     -> Dashboard con métricas clave y accesos rápidos
-│       │   └── error.html     -> Página de error amigable
-│       └── static/            -> Recursos estáticos del cliente
-│           ├── css/           -> Hojas de estilo personalizadas (estilos.css)
-│           └── js/            -> Scripts dinámicos del navegador (membresia.js)
+│       ├── reports/           -> Plantillas .jrxml y binarios compilados .jasper (Socios, Caja, Boleta)
+│       ├── application.properties
+│       └── application-prod.properties (Perfil de Producción / Heroku)
+│
+├── 🅰️ FRONTEND ANGULAR 17 SPA (TypeScript + Firebase)
+│   └── frontend-angular/
+│       ├── src/app/
+│       │   ├── components/    -> Navbar, Dashboard, Clientes, Control-Acceso
+│       │   ├── models/        -> Interfaces y Tipos TypeScript
+│       │   ├── services/      -> ClienteService, AsistenciaService, FirebaseCloudService
+│       │   └── config/        -> firebase.config.ts (Firebase Realtime Database)
+│       ├── package.json
+│       └── README.md
+│
+├── 🎨 FRONTEND MVC (HTML5 + Thymeleaf + CSS3 + Vanilla JS)
+│   └── frontend/templates/    -> Vistas renderizadas por servidor (SSR)
 │
 ├── 🗄️ BASE DE DATOS (Scripts SQL)
 │   └── database/
 │       ├── gym_db.sql               -> Script DDL y datos de prueba para MySQL 8.x
 │       └── gym_db_postgresql.sql    -> Script DDL y datos de prueba para PostgreSQL 14+
 │
-└── ⚙️ CONFIGURACIÓN Y DEPENDENCIAS
-    ├── pom.xml                                      -> Gestión de dependencias Maven organizada por capas
-    ├── src/main/resources/application.properties    -> Configuración activa (MySQL)
-    └── src/main/resources/application-postgres.properties -> Configuración alternativa (PostgreSQL)
+└── ☁️ DESPLIEGUE EN LA NUBE
+    ├── Procfile                     -> Configuración dyno Heroku
+    └── system.properties            -> Especificación de runtime Java 17
 ```
 
 ---
