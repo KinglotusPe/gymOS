@@ -31,7 +31,7 @@ public class MembresiaController {
         return "membresias/list";
     }
 
-    @GetMapping("/nuevo")
+    @GetMapping({"/nuevo", "/nueva"})
     public String nuevoForm(Model model) {
         Membresia membresia = new Membresia();
         membresia.setFechaInicio(LocalDate.now());

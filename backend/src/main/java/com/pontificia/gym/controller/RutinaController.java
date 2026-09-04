@@ -39,7 +39,7 @@ public class RutinaController {
         return "rutinas/list";
     }
 
-    @GetMapping("/nuevo")
+    @GetMapping({"/nuevo", "/nueva"})
     public String nuevoForm(Model model) {
         model.addAttribute("rutina", new Rutina());
         model.addAttribute("clientes", clienteService.listarTodos());

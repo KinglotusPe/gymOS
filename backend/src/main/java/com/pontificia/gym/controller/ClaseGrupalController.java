@@ -55,7 +55,7 @@ public class ClaseGrupalController {
         return "clases/list";
     }
 
-    @GetMapping("/nuevo")
+    @GetMapping({"/nuevo", "/nueva"})
     public String nuevo(Model model) {
         model.addAttribute("clase", new ClaseGrupal());
         model.addAttribute("disciplinas", claseGrupalService.listarDisciplinas());
