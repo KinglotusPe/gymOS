@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
+import java.util.List;
+import com.pontificia.gym.entity.Usuario;
 
 @Controller
 @RequestMapping("/caja")
@@ -41,7 +43,11 @@ public class CajaController {
         CajaResumenDto resumen = auditoriaCajaService.generarResumenCaja(fechaInicio, fechaFin, cajero);
 
         model.addAttribute("resumen", resumen);
-        model.addAttribute("usuarios", usuarioService.listarTodos());
+        // Filtrar únicamente personal administrativo / cajeros (excluir clientes)
+        List<Usuario> cajeros = usuarioService.listarTodos().stream()
+                .filter(u -> u.getRol() != com.pontificia.gym.entity.Rol.ROLE_CLIENTE)
+                .toList();
+        model.addAttribute("usuarios", cajeros);
         model.addAttribute("fechaInicio", fechaInicio);
         model.addAttribute("fechaFin", fechaFin);
         model.addAttribute("cajeroSeleccionado", cajero);

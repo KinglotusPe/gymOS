@@ -46,16 +46,28 @@ public class TiendaController {
         model.addAttribute("clientes", clienteService.listarTodos());
         model.addAttribute("totalVentasHoy", tiendaService.calcularTotalVentasHoy());
 
+        if (model.containsAttribute("ultimaVentaId")) {
+            Object idObj = model.getAttribute("ultimaVentaId");
+            if (idObj instanceof Long vid) {
+                tiendaService.buscarVentaPorId(vid).ifPresent(v -> model.addAttribute("ticketVenta", v));
+            }
+        }
+
         return "tienda/pos";
     }
 
     @PostMapping("/cobrar")
     public String procesarVenta(@RequestParam(value = "clienteId", required = false) Long clienteId,
                                 @RequestParam(value = "metodoPago", defaultValue = "EFECTIVO") String metodoPago,
-                                @RequestParam("productoIds") List<Long> productoIds,
-                                @RequestParam("cantidades") List<Integer> cantidades,
+                                @RequestParam(value = "productoIds", required = false) List<Long> productoIds,
+                                @RequestParam(value = "cantidades", required = false) List<Integer> cantidades,
                                 Authentication authentication,
                                 RedirectAttributes flash) {
+        if (productoIds == null || productoIds.isEmpty() || cantidades == null || cantidades.isEmpty()) {
+            flash.addFlashAttribute("error", "El carrito está vacío. Haz clic en al menos un producto del catálogo para agregarlo antes de cobrar.");
+            return "redirect:/tienda";
+        }
+
         try {
             List<TiendaService.ItemVentaDto> items = new ArrayList<>();
             for (int i = 0; i < productoIds.size(); i++) {
@@ -64,11 +76,17 @@ public class TiendaController {
                 }
             }
 
+            if (items.isEmpty()) {
+                flash.addFlashAttribute("error", "No se seleccionaron cantidades válidas de productos.");
+                return "redirect:/tienda";
+            }
+
             String cajero = authentication != null ? authentication.getName() : "recepcion";
             Venta venta = tiendaService.registrarVenta(clienteId, cajero, metodoPago, items);
 
             flash.addFlashAttribute("success", "¡Venta registrada con éxito! Comprobante: " + venta.getCodigoComprobante() + " por S/ " + venta.getTotal());
             flash.addFlashAttribute("ultimaVentaId", venta.getId());
+            flash.addFlashAttribute("ticketVenta", venta);
         } catch (Exception e) {
             flash.addFlashAttribute("error", "Error al procesar venta: " + e.getMessage());
         }
