@@ -10,9 +10,14 @@
             <h1 class="h3 fw-bold text-dark mb-0">Control Diario de Asistencias</h1>
             <p class="text-secondary small mb-0">Registro y monitoreo de flujo de entrada de socios</p>
         </div>
-        <a th:href="@{/asistencias/control-acceso}" class="btn btn-danger fw-bold shadow-sm">
-            <i class="bi bi-upc-scan me-1"></i> Modo Check-in Rápido / Molinete
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a th:href="@{/reportes/exportar/asistencias.csv}" class="btn btn-outline-success fw-bold shadow-sm">
+                <i class="bi bi-file-earmark-excel me-1"></i> Excel / CSV
+            </a>
+            <a th:href="@{/asistencias/control-acceso}" class="btn btn-danger fw-bold shadow-sm">
+                <i class="bi bi-upc-scan me-1"></i> Modo Check-in Rápido / Molinete
+            </a>
+        </div>
     </div>
 
     <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">

@@ -115,4 +115,25 @@ public class UsuarioServiceImpl implements UsuarioService {
         clienteRepository.findByDni("72345678").ifPresent(clienteUser::setCliente);
         usuarioRepository.save(clienteUser);
     }
+
+    @Override
+    public boolean cambiarPassword(String username, String actual, String nueva) {
+        if (username == null || actual == null || nueva == null || nueva.trim().isEmpty()) {
+            return false;
+        }
+
+        Optional<Usuario> opt = usuarioRepository.findByUsername(username);
+        if (opt.isEmpty()) {
+            return false;
+        }
+
+        Usuario u = opt.get();
+        if (!passwordEncoder.matches(actual, u.getPassword())) {
+            return false;
+        }
+
+        u.setPassword(passwordEncoder.encode(nueva));
+        usuarioRepository.save(u);
+        return true;
+    }
 }

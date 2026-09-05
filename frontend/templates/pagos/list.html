@@ -10,9 +10,14 @@
             <h1 class="h3 fw-bold text-dark mb-0">Gestión de Cobros y Pagos</h1>
             <p class="text-secondary small mb-0">Registro financiero de membresías y emisión de comprobantes</p>
         </div>
-        <a th:href="@{/pagos/nuevo}" class="btn btn-danger fw-bold shadow-sm">
-            <i class="bi bi-plus-circle me-1"></i> Registrar Pago
-        </a>
+        <div class="d-flex gap-2">
+            <a th:href="@{/reportes/exportar/pagos.csv}" class="btn btn-success fw-bold shadow-sm">
+                <i class="bi bi-file-earmark-excel me-1"></i> Exportar CSV/Excel
+            </a>
+            <a th:href="@{/pagos/nuevo}" class="btn btn-danger fw-bold shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Registrar Pago
+            </a>
+        </div>
     </div>
 
     <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -78,6 +83,11 @@
                         </td>
                         <td class="text-end">
                             <div class="btn-group">
+                                <a th:if="${p.cliente.telefono != null}" 
+                                   th:href="@{'https://wa.me/51' + ${p.cliente.telefono} + '?text=' + ${#uris.escapePath('¡Hola ' + p.cliente.nombres + '! Te confirmamos tu pago de S/ ' + p.monto + ' en BRUTAL FITNESS con comprobante REC-' + #numbers.formatInteger(p.id, 6) + '. ¡Gracias por entrenar con nosotros! 💪')}}" 
+                                   target="_blank" class="btn btn-sm btn-outline-success fw-semibold" title="Enviar Comprobante por WhatsApp">
+                                    <i class="bi bi-whatsapp"></i>
+                                </a>
                                 <a th:href="@{/pagos/{id}/boleta-pdf(id=${p.id})}" target="_blank" class="btn btn-sm btn-outline-danger fw-semibold" title="Descargar Boleta en PDF">
                                     <i class="bi bi-file-earmark-pdf-fill me-1"></i> Boleta PDF
                                 </a>

@@ -90,4 +90,38 @@ public class UsuarioController {
         redirectAttributes.addFlashAttribute("mensaje", "Usuario eliminado");
         return "redirect:/usuarios";
     }
+
+    @PostMapping("/perfil/cambiar-password")
+    public String cambiarPasswordPerfil(@RequestParam("actual") String actual,
+                                        @RequestParam("nueva") String nueva,
+                                        @RequestParam("confirmacion") String confirmacion,
+                                        org.springframework.security.core.Authentication auth,
+                                        jakarta.servlet.http.HttpServletRequest request,
+                                        RedirectAttributes redirectAttributes) {
+        String referer = request.getHeader("Referer");
+        String redirectUrl = (referer != null && !referer.isBlank()) ? referer : "/";
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        if (!nueva.equals(confirmacion)) {
+            redirectAttributes.addFlashAttribute("errorPassword", "La nueva contraseña y su confirmación no coinciden.");
+            return "redirect:" + redirectUrl;
+        }
+
+        if (nueva.length() < 4) {
+            redirectAttributes.addFlashAttribute("errorPassword", "La nueva contraseña debe tener al menos 4 caracteres.");
+            return "redirect:" + redirectUrl;
+        }
+
+        boolean exito = usuarioService.cambiarPassword(auth.getName(), actual, nueva);
+        if (exito) {
+            redirectAttributes.addFlashAttribute("mensajePassword", "¡Contraseña actualizada con éxito!");
+        } else {
+            redirectAttributes.addFlashAttribute("errorPassword", "La contraseña actual ingresada es incorrecta.");
+        }
+
+        return "redirect:" + redirectUrl;
+    }
 }

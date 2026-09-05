@@ -424,14 +424,14 @@
             <!-- Carnet Frontal -->
             <div class="p-4 text-white text-center position-relative" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-bottom: 4px solid #dc3545;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="d-flex align-items-center">
-                        <span class="fs-4 text-danger fw-bold me-2"><i class="bi bi-fire"></i></span>
+                    <div class="d-flex align-items-center gap-2">
+                        <img th:src="@{/img/logo.png}" alt="BRUTAL FITNESS" class="rounded-1 bg-white p-1 shadow-sm" style="height: 38px; width: auto;">
                         <div class="text-start">
-                            <span class="fw-bold tracking-wide">BRUTAL</span>
-                            <span class="fw-bold text-danger">FITNESS</span>
+                            <div class="fw-black text-white" style="font-weight: 900; line-height: 1.1;">BRUTAL <span class="text-danger">FITNESS</span></div>
+                            <small class="text-secondary" style="font-size: 0.65rem;">SOCIO OFICIAL</small>
                         </div>
                     </div>
-                    <span class="badge bg-danger text-uppercase px-2 py-1">CARNET OFICIAL</span>
+                    <span class="badge bg-danger text-uppercase px-2 py-1">CREDENCIAL VIP</span>
                 </div>
 
                 <!-- Foto de Avatar y Nombre -->
@@ -470,11 +470,18 @@
             </div>
 
             <!-- Footer del Modal -->
-            <div class="modal-footer bg-light border-0 d-flex justify-content-between">
+            <div class="modal-footer bg-light border-0 d-flex justify-content-between flex-wrap gap-2">
                 <button type="button" class="btn btn-outline-secondary btn-sm fw-bold px-3" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-danger btn-sm fw-bold px-3 shadow-sm" onclick="window.print()">
-                    <i class="bi bi-printer-fill me-1"></i> Imprimir Carnet
-                </button>
+                <div class="d-flex gap-2">
+                    <a th:href="@{'https://api.qrserver.com/v1/create-qr-code/?data=' + ${cliente != null ? cliente.dni : '72345678'} + '&size=300x300&color=111827'}" 
+                       th:download="${'Carnet_QR_' + (cliente != null ? cliente.dni : 'socio') + '.png'}" 
+                       target="_blank" class="btn btn-outline-dark btn-sm fw-bold px-3 shadow-sm">
+                        <i class="bi bi-download me-1"></i> Guardar QR
+                    </a>
+                    <button type="button" class="btn btn-danger btn-sm fw-bold px-3 shadow-sm" onclick="window.print()">
+                        <i class="bi bi-printer-fill me-1"></i> Imprimir Carnet
+                    </button>
+                </div>
             </div>
         </div>
     </div>

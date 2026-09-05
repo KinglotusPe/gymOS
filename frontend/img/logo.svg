@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 240" width="100%" height="100%">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+  <!-- Barra horizontal del barbell -->
+  <rect x="50" y="105" width="400" height="22" rx="4" fill="#111111" stroke="#222" stroke-width="2"/>
+  
+  <!-- Discos izquierdos (silueta con muescas dentadas) -->
+  <path d="M 25,60 C 15,75 15,90 25,100 C 15,115 15,130 25,145 C 15,160 15,175 25,185 L 55,185 L 55,60 Z" fill="#111111" stroke="#222" stroke-width="2"/>
+  <rect x="55" y="70" width="15" height="92" rx="3" fill="#1e1e1e"/>
+
+  <!-- Discos derechos (silueta con muescas dentadas) -->
+  <path d="M 475,60 C 485,75 485,90 475,100 C 485,115 485,130 475,145 C 485,160 485,175 475,185 L 445,185 L 445,60 Z" fill="#111111" stroke="#222" stroke-width="2"/>
+  <rect x="430" y="70" width="15" height="92" rx="3" fill="#1e1e1e"/>
+
+  <!-- Texto BRUTAL (Tipografía pesada condensada con borde negro) -->
+  <g filter="url(#shadow)">
+    <text x="250" y="152" 
+          text-anchor="middle" 
+          font-family="'Impact', 'Arial Black', sans-serif" 
+          font-size="115" 
+          font-weight="900" 
+          letter-spacing="2"
+          fill="#dc2626" 
+          stroke="#000000" 
+          stroke-width="7" 
+          stroke-linejoin="round"
+          style="transform-origin: center;">BRUTAL</text>
+  </g>
+
+  <!-- Texto FITNESS debajo -->
+  <text x="250" y="202" 
+        text-anchor="middle" 
+        font-family="'Montserrat', 'Arial Black', sans-serif" 
+        font-size="28" 
+        font-weight="900" 
+        letter-spacing="14" 
+        fill="#111111" 
+        stroke="#ffffff"
+        stroke-width="1">FITNESS</text>
+</svg>

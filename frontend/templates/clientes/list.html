@@ -10,9 +10,12 @@
             <h1 class="h3 fw-bold text-dark mb-0">Gestión de Clientes y Socios</h1>
             <p class="text-secondary small mb-0">Listado, registro y contacto directo de miembros</p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-wrap">
+            <a th:href="@{/reportes/exportar/clientes.csv}" class="btn btn-outline-success fw-bold shadow-sm">
+                <i class="bi bi-file-earmark-excel me-1"></i> Excel / CSV
+            </a>
             <a th:href="@{/reportes/socios}" target="_blank" class="btn btn-outline-danger fw-bold shadow-sm">
-                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Padrón PDF (Jasper)
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Padrón PDF
             </a>
             <a th:href="@{/clientes/nuevo}" class="btn btn-danger fw-bold shadow-sm">
                 <i class="bi bi-person-plus-fill me-1"></i> + Nuevo Cliente

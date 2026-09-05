@@ -32,3 +32,6 @@ target/
 ### macOS / Windows ###
 .DS_Store
 Thumbs.db
+
+# Cookies / Session files
+cookies*.txt

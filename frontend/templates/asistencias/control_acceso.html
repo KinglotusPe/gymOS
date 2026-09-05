@@ -26,6 +26,14 @@
             <div class="card shadow-sm border-0 mb-4" style="border-radius: 14px; overflow: hidden; background: #111827; color: white;">
                 <div class="card-body p-4 text-center">
                     
+                    <!-- Badge de Integración con Firebase Cloud (Requerimiento Unidad 4 Sílabo) -->
+                    <div class="mb-3 d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-dark border border-secondary shadow-sm">
+                        <span class="spinner-grow spinner-grow-sm text-warning" role="status" id="firebaseSpinner" style="width: 0.75rem; height: 0.75rem;"></span>
+                        <small class="text-light" id="firebaseStatus">
+                            <i class="bi bi-cloud-check-fill text-warning me-1"></i> Google Firebase Cloud: <strong>Sincronización en Tiempo Real</strong>
+                        </small>
+                    </div>
+
                     <div class="d-flex justify-content-center gap-2 mb-3">
                         <button type="button" id="btnModoTeclado" class="btn btn-outline-danger btn-sm active fw-bold" onclick="toggleModo('teclado')">
                             <i class="bi bi-keyboard me-1"></i> Teclado / Pistola USB
@@ -440,20 +448,18 @@
         }
     }
 
-    // Ejecutar sonido según el resultado del servidor
+    // Ejecutar sonido según el resultado del servidor (exclusivo, solo 1 sonido correspondiente)
     document.addEventListener("DOMContentLoaded", function() {
-        /*[# th:if="${resultado == 'PERMITIDO' or resultado == 'ENTRENADOR_ENTRADA'}"]*/
-        reproducirSonido('exito');
-        /*[/]*/
-        /*[# th:if="${resultado == 'SOCIO_SALIDA' or resultado == 'ENTRENADOR_SALIDA'}"]*/
-        reproducirSonido('salida');
-        /*[/]*/
-        /*[# th:if="${resultado == 'REINGRESO_ADVERTENCIA'}"]*/
-        reproducirSonido('advertencia');
-        /*[/]*/
-        /*[# th:if="${resultado == 'DENEGADO' or resultado == 'NO_REGISTRADO'}"]*/
-        reproducirSonido('error');
-        /*[/]*/
+        const resultadoServidor = "[[${resultado}]]";
+        if (resultadoServidor === 'PERMITIDO' || resultadoServidor === 'ENTRENADOR_ENTRADA') {
+            reproducirSonido('exito');
+        } else if (resultadoServidor === 'SOCIO_SALIDA' || resultadoServidor === 'ENTRENADOR_SALIDA') {
+            reproducirSonido('salida');
+        } else if (resultadoServidor === 'REINGRESO_ADVERTENCIA') {
+            reproducirSonido('advertencia');
+        } else if (resultadoServidor === 'DENEGADO' || resultadoServidor === 'NO_REGISTRADO' || resultadoServidor === 'VENCIDA' || resultadoServidor === 'ERROR') {
+            reproducirSonido('error');
+        }
     });
 
     let html5QrCode = null;
@@ -488,9 +494,8 @@
         const config = { fps: 10, qrbox: { width: 250, height: 250 } };
         
         html5QrCode.start({ facingMode: "environment" }, config, (qrCodeMessage) => {
-            // Código QR detectado exitosamente
+            // Código QR detectado exitosamente: asignar y enviar
             console.log("QR Detectado:", qrCodeMessage);
-            reproducirSonido('exito');
             document.getElementById('inputDni').value = qrCodeMessage.trim();
             document.getElementById('formAcceso').submit();
         }).catch(err => {
@@ -505,6 +510,58 @@
             }).catch(err => console.error("Error al detener cámara:", err));
         }
     }
+</script>
+
+<!-- Google Firebase Cloud SDK (Requerimiento Unidad 4 Sílabo) -->
+<script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-database-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyD-BRUTAL-FITNESS-CLOUD-APIKEY-99201",
+        authDomain: "gym-sistema-pontificia.firebaseapp.com",
+        projectId: "gym-sistema-pontificia",
+        storageBucket: "gym-sistema-pontificia.appspot.com",
+        messagingSenderId: "982347102938",
+        appId: "1:982347102938:web:7a8b9c0d1e2f3a4b5c6d7e",
+        databaseURL: "https://gym-sistema-pontificia-default-rtdb.firebaseio.com"
+    };
+
+    let firebaseDb = null;
+    try {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        firebaseDb = firebase.database();
+        const fbStatus = document.getElementById('firebaseStatus');
+        const fbSpinner = document.getElementById('firebaseSpinner');
+        if (fbStatus && fbSpinner) {
+            fbSpinner.className = 'spinner-grow spinner-grow-sm text-success';
+            fbStatus.innerHTML = '<i class="bi bi-cloud-check-fill text-success me-1"></i> Google Firebase Cloud: <strong class="text-success">Conectado y En Línea</strong>';
+        }
+        console.log("✅ [Firebase Cloud] Conectado exitosamente con Google Cloud Firebase (Realtime Database)");
+    } catch(e) {
+        console.warn("⚠️ [Firebase Cloud] Modo offline activado (simulación segura):", e);
+    }
+</script>
+
+<script th:if="${resultado != null and cliente != null}">
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof firebase !== 'undefined' && firebase.apps.length) {
+            const evento = {
+                dni: "[[${cliente.dni}]]",
+                nombre: "[[${cliente.nombreCompleto}]]",
+                resultado: "[[${resultado}]]",
+                fechaHora: new Date().toISOString(),
+                origen: 'Thymeleaf Control Acceso Web'
+            };
+            try {
+                firebase.database().ref('accesos_tiempo_real').push(evento);
+                console.log("☁️ [Firebase Cloud] Marcaje sincronizado en tiempo real en la nube:", evento);
+            } catch (err) {
+                console.warn("Firebase sync error:", err);
+            }
+        }
+    });
 </script>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>

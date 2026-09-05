@@ -12,4 +12,5 @@ public interface UsuarioService {
     Usuario guardar(Usuario usuario);
     void eliminar(Long id);
     void inicializarUsuariosPorDefecto();
+    boolean cambiarPassword(String username, String actual, String nueva);
 }
