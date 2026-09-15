@@ -417,16 +417,16 @@ Abre tu navegador en: **[http://localhost:8080](http://localhost:8080)**
 
 ---
 
-## 🎓 Cumplimiento del Sílabo Oficial (La Pontificia - 5to Semestre)
+## 🏛️ Arquitectura Modular del Sistema y Tecnologías Implementadas
 
-El sistema ha sido estructurado para cumplir con el 100% de los logros y capacidades del curso **Programación de Aplicaciones Web**:
+El sistema ha sido estructurado en una arquitectura de software robusta, escalable y por capas:
 
-| Unidad | Temas del Sílabo | Componentes Implementados en el Repositorio |
+| Módulo / Fase | Tecnologías y Conceptos Clave | Componentes Implementados en el Repositorio |
 | :---: | :--- | :--- |
-| **Unidad 1** | • JPA & Anotaciones<br>• JPQL y Relaciones<br>• Maven & Ciclo de Vida<br>• Git & GitHub | • Modelos `@Entity` en `com.pontificia.gym.entity`.<br>• Consultas JPQL con `@Query` y relaciones relacionales.<br>• `pom.xml` multi-módulo y wrapper `mvnw`.<br>• Repositorio en GitHub sincronizado. |
-| **Unidad 2** | • Spring Boot & Inyección Core<br>• Spring Data JPA con **Paginación y Ordenamiento**<br>• Spring Web MVC y Estereotipos<br>• Spring Security (BCrypt, Roles, CORS)<br>• **Spring RESTful APIs** | • Paginación `Pageable` y `Sort` en `ClienteRepository`, `ClienteService` y `ClienteController`.<br>• Seguridad en `SecurityConfig.java` con CORS y exclusión CSRF en APIs.<br>• Controladores RESTful (`@RestController`) en `com.pontificia.gym.controller.api`: `/api/clientes`, `/api/asistencias/escanear`, `/api/dashboard/stats`, `/api/membresias`, `/api/tienda`. |
-| **Unidad 3** | • **JasperReports** (Diseño e Integración)<br>• Reportes en PDF con resúmenes y gráficos<br>• **Despliegue en la Nube (Heroku)** | • 3 Reportes oficiales precompilados a `.jasper` optimizados para Java 17:<br>  1. Padrón de Socios (`/reportes/socios`)<br>  2. Arqueo de Caja (`/reportes/caja`)<br>  3. Boleta de Pago Electrónica (`/reportes/boleta/{id}`)<br>• Archivos para la nube: `Procfile`, `system.properties` y `application-prod.properties`. |
-| **Unidad 4** | • **Angular 17 Standalone** (SPA)<br>• **TypeScript** (Modelos, Clases, Interfaces, Promesas)<br>• Componentes y Comunicación<br>• **Servicios en la Nube con Firebase** | • Aplicación SPA completa en `frontend-angular/`.<br>• Modelos fuertemente tipados y servicios `HttpClient` con RxJS.<br>• Componentes: Navbar, Dashboard, Clientes paginado, Control de Acceso con lectura de DNI por código de barras y Web Audio API.<br>• Sincronización en tiempo real con **Firebase Realtime Database** (`firebase-cloud.service.ts`). |
+| **Fase 1: Persistencia & Modelado** | • JPA & Anotaciones Hibernate<br>• JPQL y Consultas Relacionales<br>• Maven & Ciclo de Vida de Construcción<br>• Control de Versiones Git & GitHub | • Modelos `@Entity` en `com.pontificia.gym.entity`.<br>• Consultas JPQL optimizadas con `@Query` y relaciones relacionales.<br>• `pom.xml` multi-módulo y wrapper `mvnw`.<br>• Repositorio en GitHub sincronizado con commits atómicos. |
+| **Fase 2: MVC, Seguridad & REST APIs** | • Spring Boot & Inyección de Dependencias Core<br>• Spring Data JPA con **Paginación y Ordenamiento**<br>• Spring Web MVC y Controladores Estereotipo<br>• Spring Security (BCrypt, Roles, CORS)<br>• **Spring RESTful APIs** | • Paginación `Pageable` y `Sort` en `ClienteRepository`, `ClienteService` y `ClienteController`.<br>• Seguridad en `SecurityConfig.java` con CORS y exclusión CSRF en APIs.<br>• Controladores RESTful (`@RestController`) en `com.pontificia.gym.controller.api`: `/api/clientes`, `/api/asistencias/escanear`, `/api/dashboard/stats`, `/api/membresias`, `/api/tienda`. |
+| **Fase 3: Reportes Ejecutivos & Cloud** | • **JasperReports** (Diseño e Integración Java 17)<br>• Reportes en PDF con resúmenes y gráficos<br>• **Despliegue en la Nube (Heroku)** | • 3 Reportes oficiales precompilados a `.jasper` optimizados para Java 17:<br>  1. Padrón de Socios (`/reportes/socios`)<br>  2. Arqueo de Caja (`/reportes/caja`)<br>  3. Boleta de Pago Electrónica (`/reportes/boleta/{id}`)<br>• Archivos para la nube: `Procfile`, `system.properties` y `application-prod.properties`. |
+| **Fase 4: Angular 17 SPA & Firebase** | • **Angular 17 Standalone** (SPA)<br>• **TypeScript** (Modelos, Clases, Interfaces, Promesas)<br>• Componentes y Comunicación Reactiva<br>• **Servicios en la Nube con Firebase** | • Aplicación SPA completa en `frontend-angular/`.<br>• Modelos fuertemente tipados y servicios `HttpClient` con RxJS.<br>• Componentes: Navbar, Dashboard, Clientes paginado, Control de Acceso con lectura de DNI por código de barras y Web Audio API.<br>• Sincronización en tiempo real con **Firebase Realtime Database** (`firebase-cloud.service.ts`). |
 
 ---
 
@@ -533,3 +533,10 @@ Proyecto desarrollado para la carrera de **Ingeniería de Sistemas de Informaci�
 
 * **Gimnasio Beneficiario:** **BRUTAL FITNESS** (Jr. José Santos Chocano, Distrito de Jesús Nazareno, Ayacucho).
 * **Título del Proyecto:** *Sistema web de gestión para BRUTAL FITNESS: Gestión de clientes, membresías, pagos y asistencias*.
+
+---
+
+## 📜 Licencia de Uso
+
+Este proyecto se encuentra bajo la licencia **MIT**. Para más detalles, consulta el archivo [LICENSE](LICENSE).
+
