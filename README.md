@@ -1,8 +1,20 @@
-# 🔥 BRUTAL FITNESS — Sistema de Gestión para Gimnasio 🏋️‍♂️
+<div align="center">
 
-Sistema web integral diseñado para modernizar y digitalizar la administración operativa del gimnasio **BRUTAL FITNESS** (ubicado en el **Jirón José Santos Chocano, Distrito de Jesús Nazareno, Ayacucho**), aplicando la **arquitectura por capas** con **Spring Boot**, **Spring Data JPA**, **Thymeleaf**, **MySQL** y **PostgreSQL**.
+# ⚡ gymOS — Sistema Integral de Gestión para Gimnasios 🏋️‍♂️
+**Plataforma de software completa, modular y moderna para la administración operativa de gimnasios, clubes fitness y centros de entrenamiento.**  
+*Implementación oficial con soporte biométrico y portal móvil para **BRUTAL FITNESS**.*
+
+<p align="center">
+  <a href="https://github.com/KinglotusPe/gymOS/stargazers"><img src="https://img.shields.io/github/stars/KinglotusPe/gymOS?style=for-the-badge&logo=github&color=FF4500" alt="Stars"></a>
+  <a href="https://github.com/KinglotusPe/gymOS/network/members"><img src="https://img.shields.io/github/forks/KinglotusPe/gymOS?style=for-the-badge&logo=github&color=333" alt="Forks"></a>
+  <a href="https://buymeacoffee.com/kinglotusp" target="_blank"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Kinglotusp-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-00C853?style=for-the-badge" alt="License MIT"></a>
+</p>
+
+</div>
 
 ---
+
 
 ## 📌 Problemática y Solución
 
@@ -370,12 +382,18 @@ El sistema integra **Spring Security 6** con protección CSRF, sesiones seguras 
 
 ## ⚙️ Configuración y Ejecución Local
 
-### 1. Requisitos Previos
+### 1. Clonar el Repositorio
+```bash
+git clone https://github.com/KinglotusPe/gymOS.git
+cd gymOS
+```
+
+### 2. Requisitos Previos
 * Java Development Kit (JDK 17 o superior).
 * Servidor de Base de Datos: **MySQL** (puerto `3306`) o **PostgreSQL** (puerto `5432`).
 * Apache Maven (o Maven Wrapper).
 
-### 2. Configuración de Base de Datos
+### 3. Configuración de Base de Datos
 
 #### Opción A: Usando MySQL (Por Defecto)
 En `backend/src/main/resources/application.properties`:
@@ -534,9 +552,24 @@ Proyecto desarrollado para la carrera de **Ingeniería de Sistemas de Informaci�
 * **Gimnasio Beneficiario:** **BRUTAL FITNESS** (Jr. José Santos Chocano, Distrito de Jesús Nazareno, Ayacucho).
 * **Título del Proyecto:** *Sistema web de gestión para BRUTAL FITNESS: Gestión de clientes, membresías, pagos y asistencias*.
 
+## ☕ Apoya el Proyecto (Buy Me a Coffee)
+
+Si este proyecto te sirvió como base, te ahorró tiempo de desarrollo o te gustó su arquitectura:
+
+<div align="center">
+  <br>
+  <a href="https://buymeacoffee.com/kinglotusp" target="_blank">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+  </a>
+  <br><br>
+  <p>☕ Puedes apoyar al creador invitándole un café en: <a href="https://buymeacoffee.com/kinglotusp"><b>buymeacoffee.com/kinglotusp</b></a></p>
+  <p><i>¡Cada contribución ayuda a mantener el proyecto activo y seguir agregando módulos de código abierto para gimnasios! ⭐</i></p>
+</div>
+
 ---
 
 ## 📜 Licencia de Uso
 
 Este proyecto se encuentra bajo la licencia **MIT**. Para más detalles, consulta el archivo [LICENSE](LICENSE).
+
 
