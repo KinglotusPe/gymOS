@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(titulo='Biblioteca de Ejercicios y Técnica')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+
+    <!-- Header -->
+    <div class="card shadow-sm border-0 mb-4 p-4" style="background: #ffffff; border-radius: 12px; border-left: 5px solid #dc3545 !important;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 class="h3 fw-bold text-dark mb-1">
+                    <i class="bi bi-collection-play-fill text-danger me-2"></i> Biblioteca Visual de Ejercicios
+                </h1>
+                <p class="text-muted mb-0 small">
+                    Guía de técnica interactiva con animaciones en vivo de cada ejercicio, ejecución paso a paso y músculos involucrados.
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/rutinas}" class="btn btn-outline-danger fw-semibold">
+                    <i class="bi bi-journal-text me-1"></i> Ir a Rutinas
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de Búsqueda y Filtros por Músculo -->
+    <div class="card shadow-sm border-0 mb-4 p-3" style="border-radius: 12px;">
+        <form th:action="@{/ejercicios}" method="get" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" class="form-control" th:value="${query}" placeholder="Buscar ejercicio (ej. Press, Sentadilla, Remo)...">
+                    <button class="btn btn-danger" type="submit">Buscar</button>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="d-flex flex-wrap gap-1 justify-content-md-end">
+                    <a th:href="@{/ejercicios(grupo='TODOS')}" 
+                       class="btn btn-sm" th:classappend="${grupoSeleccionado == 'TODOS' ? 'btn-dark' : 'btn-outline-secondary'}">
+                       Todos
+                    </a>
+                    <a th:href="@{/ejercicios(grupo='Pecho')}" 
+                       class="btn btn-sm" th:classappend="${grupoSeleccionado == 'Pecho' ? 'btn-danger' : 'btn-outline-danger'}">
+                       💪 Pecho
+                    </a>
+                    <a th:href="@{/ejercicios(grupo='Espalda')}" 
+                       class="btn btn-sm" th:classappend="${grupoSeleccionado == 'Espalda' ? 'btn-danger' : 'btn-outline-danger'}">
+                       🦅 Espalda
+                    </a>
+                    <a th:href="@{/ejercicios(grupo='Piernas')}" 
+                       class="btn btn-sm" th:classappend="${grupoSeleccionado == 'Piernas' ? 'btn-danger' : 'btn-outline-danger'}">
+                       🦵 Piernas
+                    </a>
+                    <a th:href="@{/ejercicios(grupo='Hombros')}" 
+                       class="btn btn-sm" th:classappend="${grupoSeleccionado == 'Hombros' ? 'btn-danger' : 'btn-outline-danger'}">
+                       🛡️ Hombros
+                    </a>
+                    <a th:href="@{/ejercicios(grupo='Brazos')}" 
+                       class="btn btn-sm" th:classappend="${grupoSeleccionado == 'Brazos' ? 'btn-danger' : 'btn-outline-danger'}">
+                       🥊 Brazos
+                    </a>
+                    <a th:href="@{/ejercicios(grupo='Core')}" 
+                       class="btn btn-sm" th:classappend="${grupoSeleccionado == 'Core' ? 'btn-danger' : 'btn-outline-danger'}">
+                       ⚡ Core
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Grid de Tarjetas de Ejercicios -->
+    <div class="row g-4">
+        <div class="col-lg-4 col-md-6" th:each="e : ${ejercicios}">
+            <div class="card h-100 shadow-sm border-0" style="border-radius: 14px; overflow: hidden; background: #ffffff;">
+                <!-- Animación GIF en Vivo -->
+                <div class="position-relative text-center p-2 d-flex align-items-center justify-content-center" style="height: 230px; background-color: #0f172a !important;">
+                    <img th:src="${e.gifUrl != null ? e.gifUrl : e.imagenUrl}" 
+                         th:alt="${e.nombre}"
+                         class="img-fluid rounded" 
+                         style="max-height: 215px; width: auto; object-fit: contain;"
+                         loading="lazy"
+                         referrerpolicy="no-referrer">
+                    <span class="position-absolute top-0 start-0 m-2 badge bg-danger shadow-sm" th:text="${e.grupoMuscular}">Pecho</span>
+                    <span class="position-absolute top-0 end-0 m-2 badge bg-dark border border-secondary shadow-sm" th:text="${e.nivel}">Intermedio</span>
+                </div>
+
+                <!-- Contenido -->
+                <div class="card-body d-flex flex-column justify-content-between p-3">
+                    <div>
+                        <h2 class="h5 fw-bold text-dark mb-1" th:text="${e.nombre}">Press de Banca</h2>
+                        <div class="small text-muted mb-2">
+                            <span class="badge bg-light text-dark border me-1"><i class="bi bi-tools text-danger me-1"></i> <span th:text="${e.equipamiento}">Máquina Smith</span></span>
+                            <span class="badge bg-light text-dark border"><i class="bi bi-tag text-primary me-1"></i> <span th:text="${e.categoria}">Fuerza</span></span>
+                        </div>
+                        <p class="text-secondary small mb-3 text-truncate-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" th:text="${e.instrucciones}">
+                            Instrucciones de técnica...
+                        </p>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-dark btn-sm w-100 fw-bold mt-2" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#modalEjercicio"
+                            th:data-nombre="${e.nombre}"
+                            th:data-grupo="${e.grupoMuscular}"
+                            th:data-equipo="${e.equipamiento}"
+                            th:data-nivel="${e.nivel}"
+                            th:data-gif="${e.gifUrl}"
+                            th:data-instrucciones="${e.instrucciones}">
+                        <i class="bi bi-play-circle-fill text-danger me-1"></i> Ver Técnica y Pasos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerta si no hay resultados -->
+        <div class="col-12" th:if="${#lists.isEmpty(ejercicios)}">
+            <div class="card shadow-sm border-0 p-5 text-center text-muted" style="border-radius: 12px;">
+                <i class="bi bi-emoji-frown fs-1 text-danger mb-2"></i>
+                <h3 class="h5 fw-bold text-dark">No se encontraron ejercicios</h3>
+                <p class="small mb-3">Intenta buscar con otra palabra clave o selecciona la categoría "Todos".</p>
+                <div>
+                    <a th:href="@{/ejercicios}" class="btn btn-danger btn-sm fw-bold">Restablecer Filtros</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal de Técnica Detallada con GIF Animado -->
+<div class="modal fade" id="modalEjercicio" tabindex="-1" aria-labelledby="modalEjercicioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header bg-dark text-white border-bottom border-danger border-2" style="background-color: #111827 !important;">
+                <h5 class="modal-title fw-bold" id="modalEjercicioLabel">
+                    <i class="bi bi-fire text-danger me-2"></i> <span id="modalTitulo">Nombre Ejercicio</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-6 text-center rounded-3 p-3" style="background-color: #0f172a !important;">
+                        <img id="modalGif" src="" alt="Animación" class="img-fluid rounded" style="max-height: 280px; object-fit: contain;" referrerpolicy="no-referrer">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex gap-2 mb-3">
+                            <span id="modalBadgeGrupo" class="badge bg-danger">Músculo</span>
+                            <span id="modalBadgeNivel" class="badge bg-dark">Nivel</span>
+                            <span id="modalBadgeEquipo" class="badge bg-secondary">Equipo</span>
+                        </div>
+                        <h6 class="fw-bold text-dark"><i class="bi bi-list-check text-danger me-1"></i> Guía de Ejecución:</h6>
+                        <pre id="modalInstrucciones" class="bg-light p-3 rounded-3 small text-dark font-sans-serif" style="white-space: pre-wrap; font-family: inherit; max-height: 200px; overflow-y: auto;">
+                        </pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-dark btn-sm fw-bold px-4" data-bs-dismiss="modal">Entendido</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<script>
+    const modal = document.getElementById('modalEjercicio');
+    if (modal) {
+        modal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const nombre = button.getAttribute('data-nombre');
+            const grupo = button.getAttribute('data-grupo');
+            const equipo = button.getAttribute('data-equipo');
+            const nivel = button.getAttribute('data-nivel');
+            const gif = button.getAttribute('data-gif');
+            const instrucciones = button.getAttribute('data-instrucciones');
+
+            document.getElementById('modalTitulo').textContent = nombre;
+            document.getElementById('modalBadgeGrupo').textContent = grupo;
+            document.getElementById('modalBadgeNivel').textContent = nivel;
+            document.getElementById('modalBadgeEquipo').textContent = equipo;
+            document.getElementById('modalGif').src = gif;
+            document.getElementById('modalInstrucciones').textContent = instrucciones;
+        });
+    }
+</script>
+
+</body>
+</html>

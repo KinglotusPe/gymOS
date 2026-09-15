@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(titulo='Gestión de Inventario - Tienda')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5 mt-3">
+
+    <!-- Mensajes Flash -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-1">
+                <i class="bi bi-boxes text-danger me-2"></i> Inventario & Catálogo de Productos
+            </h1>
+            <p class="text-secondary small mb-0">Administra los productos de la tienda, ajusta el stock y modifica los precios de venta.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/tienda}" class="btn btn-outline-dark fw-bold">
+                <i class="bi bi-cart3 me-1"></i> Ir a Caja / POS
+            </a>
+            <a th:href="@{/tienda/productos/nuevo}" class="btn btn-danger fw-bold shadow-sm">
+                <i class="bi bi-plus-circle-fill me-1"></i> + Nuevo Producto
+            </a>
+        </div>
+    </div>
+
+    <!-- Tabla de Productos -->
+    <div class="card shadow-sm border-0" style="border-radius: 14px; overflow: hidden;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Foto</th>
+                            <th>Producto / Descripción</th>
+                            <th>Categoría</th>
+                            <th>Código Barras</th>
+                            <th>Stock Disponible</th>
+                            <th>Precio Venta</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${productos}">
+                            <td style="width: 70px;">
+                                <img th:src="${p.imagenUrl != null ? p.imagenUrl : 'https://images.unsplash.com/photo-1579758629938-03607ccdbaba?w=100'}" 
+                                     alt="" 
+                                     class="rounded-3 border" 
+                                     style="width: 50px; height: 50px; object-fit: cover;">
+                            </td>
+                            <td>
+                                <strong class="d-block text-dark" th:text="${p.nombre}">Proteína 100% Whey</strong>
+                                <small class="text-muted" th:text="${p.descripcion}">Proteína pura de suero...</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-dark border" th:text="${p.categoria.nombre}">Suplementos</span>
+                            </td>
+                            <td class="font-monospace small text-muted" th:text="${p.codigoBarra != null ? p.codigoBarra : '---'}">
+                                775123456001
+                            </td>
+                            <td>
+                                <span class="badge px-3 py-2 fs-6" 
+                                      th:classappend="${p.stock > 5 ? 'bg-success' : (p.stock > 0 ? 'bg-warning text-dark' : 'bg-danger')}"
+                                      th:text="${p.stock + ' un.'}">
+                                    15 un.
+                                </span>
+                            </td>
+                            <td>
+                                <strong class="text-danger fs-6" th:text="${'S/ ' + p.precioUnitario}">S/ 185.00</strong>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a th:href="@{/tienda/productos/editar/{id}(id=${p.id})}" 
+                                       class="btn btn-outline-primary" 
+                                       title="Editar producto o reponer stock">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                    <form th:action="@{/tienda/productos/eliminar/{id}(id=${p.id})}" 
+                                          method="post" 
+                                          style="display: inline;"
+                                          onsubmit="return confirm('¿Estás seguro de eliminar este producto del inventario?');">
+                                        <button type="submit" class="btn btn-outline-danger" title="Eliminar producto">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(productos)}">
+                            <td colspan="7" class="text-center text-muted py-5">
+                                <i class="bi bi-box2 fs-1 d-block mb-2 text-secondary"></i>
+                                No hay productos en el inventario. Haz clic en <strong>+ Nuevo Producto</strong> para agregar uno.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

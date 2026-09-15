@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Progreso Físico')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-activity text-danger me-2"></i>Control de Progreso y Medidas Físicas
+            </h2>
+            <p class="text-muted small mb-0">Evaluaciones antropométricas, evolución de peso, IMC y masa muscular</p>
+        </div>
+        <a th:href="@{/seguimientos/nuevo}" class="btn btn-danger fw-semibold">
+            <i class="bi bi-plus-circle me-1"></i> + Nueva Evaluación
+        </a>
+    </div>
+
+    <!-- Alertas Flash -->
+    <div class="alert alert-success alert-dismissible fade show" th:if="${success}">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" th:if="${error}">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Entrenador</th>
+                        <th>Peso</th>
+                        <th>Altura</th>
+                        <th>IMC</th>
+                        <th>% Grasa</th>
+                        <th>Masa Musc.</th>
+                        <th>Objetivo</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="s : ${seguimientos}">
+                        <td class="fw-semibold" th:text="${#temporals.format(s.fechaRegistro, 'dd/MM/yyyy')}">27/08/2026</td>
+                        <td class="fw-bold text-dark" th:text="${s.cliente.nombreCompleto}">Juan Carlos</td>
+                        <td th:text="${s.entrenador != null ? s.entrenador.nombreCompleto : 'Sin asignar'}">Prof. Ramos</td>
+                        <td><span class="badge bg-primary" th:text="${s.pesoKg + ' kg'}">75.0 kg</span></td>
+                        <td th:text="${s.alturaCm != null ? s.alturaCm + ' cm' : '-'}">175 cm</td>
+                        <td>
+                            <span class="badge bg-dark" th:if="${s.imc != null}" th:text="${s.imc}">24.5</span>
+                            <span th:if="${s.imc == null}">-</span>
+                        </td>
+                        <td th:text="${s.porcentajeGrasa != null ? s.porcentajeGrasa + '%' : '-'}">18%</td>
+                        <td th:text="${s.masaMuscular != null ? s.masaMuscular + ' kg' : '-'}">35 kg</td>
+                        <td>
+                            <span class="badge bg-secondary" th:text="${s.objetivo != null ? s.objetivo : 'General'}">Hipertrofia</span>
+                        </td>
+                        <td class="text-center">
+                            <a th:href="@{/seguimientos/editar/{id}(id=${s.id})}" class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a th:href="@{/seguimientos/eliminar/{id}(id=${s.id})}" class="btn btn-sm btn-outline-danger" title="Eliminar"
+                               onclick="return confirm('¿Seguro que deseas eliminar esta ficha?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(seguimientos)}">
+                        <td colspan="10" class="text-center text-muted py-4">
+                            <i class="bi bi-heart-pulse fs-2 d-block mb-2 text-secondary"></i>
+                            No hay evaluaciones registradas. Haz clic en <strong>+ Nueva Evaluación</strong>.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Membresía')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="card shadow-sm p-4 mx-auto" style="max-width: 800px; border-radius: 12px;">
+        <h2 class="mb-4" th:text="${membresia.id} != null ? 'Editar Membresía' : 'Nueva Membresía'">Membresía</h2>
+
+        <form th:action="@{/membresias/guardar}" th:object="${membresia}" method="post" class="row g-3" id="formMembresia">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Cliente</label>
+                <select th:field="*{cliente}" class="form-select" required>
+                    <option value="">-- Seleccione un cliente --</option>
+                    <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nombreCompleto}"></option>
+                </select>
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('cliente')}" th:errors="*{cliente}"></div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Tipo de membresía</label>
+                <select th:field="*{tipo}" class="form-select" id="selectTipo" required>
+                    <option value="">-- Seleccione el tipo --</option>
+                    <option th:each="t : ${tipos}" th:value="${t}" th:text="${t}"></option>
+                </select>
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Fecha de inicio</label>
+                <input type="date" th:field="*{fechaInicio}" class="form-control" id="inputFechaInicio" required>
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('fechaInicio')}" th:errors="*{fechaInicio}"></div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Fecha de vencimiento</label>
+                <input type="date" th:field="*{fechaVencimiento}" class="form-control" id="inputFechaVencimiento" required>
+                <div class="form-text text-muted" id="infoVencimiento">
+                    ✨ Calculada automáticamente según el tipo de membresía.
+                </div>
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('fechaVencimiento')}" th:errors="*{fechaVencimiento}"></div>
+            </div>
+
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary px-4">Guardar</button>
+                <a th:href="@{/membresias}" class="btn btn-secondary ms-2">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<script th:src="@{/js/membresia.js}"></script>
+</body>
+</html>

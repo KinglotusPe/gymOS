@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(titulo='Formulario de Producto - Tienda')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5 mt-3" style="max-width: 800px;">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/tienda}" class="text-decoration-none text-danger fw-bold">Tienda</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/tienda/productos}" class="text-decoration-none text-danger">Inventario</a></li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="${producto.id == null ? 'Nuevo Producto' : 'Editar Producto'}">Nuevo Producto</li>
+        </ol>
+    </nav>
+
+    <!-- Card Formulario -->
+    <div class="card shadow-sm border-0" style="border-radius: 14px; overflow: hidden;">
+        <div class="card-header bg-dark text-white p-3 border-bottom border-danger border-2" style="background-color: #111827 !important;">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="h5 fw-bold mb-0">
+                    <i class="bi bi-box-seam text-danger me-2"></i>
+                    <span th:text="${producto.id == null ? 'Registrar Nuevo Producto' : 'Editar / Actualizar Producto'}">Registrar Producto</span>
+                </span>
+                <span class="badge bg-danger" th:text="${producto.id == null ? 'NUEVO' : 'ID: ' + producto.id}">NUEVO</span>
+            </div>
+        </div>
+
+        <div class="card-body p-4 bg-white">
+            <form th:action="@{/tienda/productos/guardar}" th:object="${producto}" method="post">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="row g-3">
+                    <!-- Nombre del Producto -->
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold text-dark">Nombre del Producto *</label>
+                        <input type="text" th:field="*{nombre}" class="form-control" placeholder="Ej: Proteína Whey Gold 2lb, Candado de Seguridad..." required>
+                    </div>
+
+                    <!-- Categoría -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">Categoría *</label>
+                        <select th:field="*{categoria.id}" class="form-select" required>
+                            <option value="">-- Seleccionar --</option>
+                            <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}"></option>
+                        </select>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold text-dark">Descripción o Detalles</label>
+                        <textarea th:field="*{descripcion}" class="form-control" rows="2" placeholder="Especificaciones, sabor, material, uso recomendado..."></textarea>
+                    </div>
+
+                    <!-- Precio de Venta -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">Precio de Venta (S/) *</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light fw-bold">S/</span>
+                            <input type="number" step="0.50" min="0.50" th:field="*{precioUnitario}" class="form-control" placeholder="0.00" required>
+                        </div>
+                    </div>
+
+                    <!-- Stock Disponible -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">Stock Disponible (Unidades) *</label>
+                        <input type="number" min="0" th:field="*{stock}" class="form-control" placeholder="Ej: 20" required>
+                    </div>
+
+                    <!-- Código de Barras -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">Código de Barras / SKU</label>
+                        <input type="text" th:field="*{codigoBarra}" class="form-control" placeholder="Ej: 775123456001">
+                    </div>
+
+                    <!-- URL de Imagen / Foto -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold text-dark">URL de Imagen del Producto</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-image"></i></span>
+                            <input type="url" th:field="*{imagenUrl}" id="inputImagenUrl" class="form-control" placeholder="https://ejemplo.com/foto-producto.jpg" oninput="actualizarPreviewFoto()">
+                        </div>
+                        <small class="text-muted">Pega un enlace de imagen (o deja en blanco para usar la imagen por defecto).</small>
+                    </div>
+
+                    <!-- Vista Previa de la Foto -->
+                    <div class="col-12 text-center p-3 bg-light rounded-3 border">
+                        <small class="d-block text-muted fw-bold mb-2">VISTA PREVIA DE LA FOTO:</small>
+                        <img id="previewFoto" 
+                             th:src="${producto.imagenUrl != null && !producto.imagenUrl.isEmpty() ? producto.imagenUrl : 'https://images.unsplash.com/photo-1579758629938-03607ccdbaba?w=300'}" 
+                             alt="Vista previa" 
+                             class="img-fluid rounded border shadow-sm" 
+                             style="max-height: 150px; object-fit: contain;">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                    <a th:href="@{/tienda/productos}" class="btn btn-outline-secondary fw-bold">
+                        <i class="bi bi-arrow-left me-1"></i> Cancelar y Volver
+                    </a>
+                    <button type="submit" class="btn btn-danger fw-bold px-4 py-2 shadow-sm">
+                        <i class="bi bi-check-circle-fill me-1"></i> Guardar Producto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function actualizarPreviewFoto() {
+        const url = document.getElementById('inputImagenUrl').value.trim();
+        const img = document.getElementById('previewFoto');
+        if (url) {
+            img.src = url;
+        } else {
+            img.src = 'https://images.unsplash.com/photo-1579758629938-03607ccdbaba?w=300';
+        }
+    }
+</script>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

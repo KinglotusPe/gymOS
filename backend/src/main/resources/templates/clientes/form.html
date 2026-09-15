@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo=${cliente.id != null ? 'Editar Socio' : 'Nuevo Socio'})}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 750px; border-radius: 14px; overflow: hidden;">
+        <div class="card-header bg-dark text-white p-4 border-bottom border-danger border-2" style="background-color: #111827 !important;">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-person-badge-fill text-danger fs-3 me-3"></i>
+                <div>
+                    <h1 class="h5 fw-bold mb-0" th:text="${cliente.id != null ? 'Editar Ficha de Socio' : 'Registrar Nuevo Socio'}">Ficha de Socio</h1>
+                    <small class="text-secondary">Información personal, contacto y fotografía para verificación biométrica de acceso</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-4 p-md-5 bg-white">
+            <form th:action="@{/clientes/guardar}" th:object="${cliente}" method="post" class="row g-3">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-dark small">DNI / Documento de Identidad *</label>
+                    <input type="text" th:field="*{dni}" class="form-control" placeholder="Ej: 72345678" required>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-dark small">Teléfono / WhatsApp *</label>
+                    <input type="text" th:field="*{telefono}" class="form-control" placeholder="Ej: 987654321">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-dark small">Nombres *</label>
+                    <input type="text" th:field="*{nombres}" class="form-control" placeholder="Ej: Juan Carlos" required>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-dark small">Apellidos *</label>
+                    <input type="text" th:field="*{apellidos}" class="form-control" placeholder="Ej: Perez Lopez" required>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-dark small">Edad (Años)</label>
+                    <input type="number" th:field="*{edad}" class="form-control" min="12" max="100" placeholder="Ej: 25">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold text-dark small">Fecha de Inscripción</label>
+                    <input type="date" th:field="*{fechaInscripcion}" class="form-control">
+                </div>
+
+                <!-- URL Fotografía Facial del Cliente -->
+                <div class="col-12">
+                    <label class="form-label fw-semibold text-dark small">
+                        <i class="bi bi-camera-fill text-danger me-1"></i> Fotografía del Socio (URL / Enlace Web):
+                    </label>
+                    <input type="url" th:field="*{fotoUrl}" id="inputFoto" class="form-control" 
+                           placeholder="https://images.unsplash.com/... o enlace de foto"
+                           oninput="document.getElementById('previewFoto').src = this.value || 'https://ui-avatars.com/api/?name=Socio&background=dc3545&color=fff&size=200';">
+                    <div class="d-flex align-items-center gap-3 mt-2 p-2 bg-light rounded-3 border">
+                        <img id="previewFoto" 
+                             th:src="${cliente.fotoUrlOrDefault}" 
+                             alt="Vista previa" 
+                             class="rounded-circle border border-2 border-danger" 
+                             style="width: 55px; height: 55px; object-fit: cover;">
+                        <small class="text-muted">Esta foto se mostrará al recepcionista en el molinete de acceso para verificar que nadie suplante al socio.</small>
+                    </div>
+                </div>
+
+                <div class="col-12 d-flex justify-content-between pt-3">
+                    <a th:href="@{/clientes}" class="btn btn-outline-secondary px-4 fw-semibold">
+                        <i class="bi bi-arrow-left me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm">
+                        <i class="bi bi-check-lg me-1"></i> Guardar Ficha
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

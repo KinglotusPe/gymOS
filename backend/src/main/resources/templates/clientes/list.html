@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Clientes')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-0">Gestión de Clientes y Socios</h1>
+            <p class="text-secondary small mb-0">Listado, registro y contacto directo de miembros</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a th:href="@{/reportes/exportar/clientes.csv}" class="btn btn-outline-success fw-bold shadow-sm">
+                <i class="bi bi-file-earmark-excel me-1"></i> Excel / CSV
+            </a>
+            <a th:href="@{/reportes/socios}" target="_blank" class="btn btn-outline-danger fw-bold shadow-sm">
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Padrón PDF
+            </a>
+            <a th:href="@{/clientes/nuevo}" class="btn btn-danger fw-bold shadow-sm">
+                <i class="bi bi-person-plus-fill me-1"></i> + Nuevo Cliente
+            </a>
+        </div>
+    </div>
+
+    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Buscador -->
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 12px;">
+        <div class="card-body p-3">
+            <form th:action="@{/clientes}" method="get" class="d-flex gap-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="buscar" th:value="${buscar}" class="form-control border-start-0"
+                           placeholder="Buscar socio por nombres o apellidos...">
+                </div>
+                <button type="submit" class="btn btn-dark fw-semibold px-4">Buscar</button>
+                <a th:if="${buscar}" th:href="@{/clientes}" class="btn btn-outline-secondary">Limpiar</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Clientes -->
+    <div class="card shadow-sm border-0" style="border-radius: 12px;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>DNI</th>
+                        <th>Nombres y Apellidos</th>
+                        <th>Edad</th>
+                        <th>Teléfono / WhatsApp</th>
+                        <th>Inscripción</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="cliente : ${clientes}">
+                        <td>
+                            <code class="fw-bold text-dark fs-6" th:text="${cliente.dni}">72345678</code>
+                        </td>
+                        <td>
+                            <strong class="text-dark" th:text="${cliente.nombreCompleto}">Juan Carlos Perez</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border" th:text="${cliente.edad != null ? cliente.edad + ' años' : '-'}">28 años</span>
+                        </td>
+                        <td>
+                            <span th:if="${cliente.telefono != null}">
+                                <a th:href="@{'https://wa.me/51' + ${cliente.telefono} + '?text=' + ${#uris.escapePath('Hola ' + cliente.nombres + ', te saludamos de BRUTAL FITNESS.')}}" 
+                                   target="_blank" class="btn btn-sm btn-outline-success fw-bold">
+                                    <i class="bi bi-whatsapp me-1"></i> <span th:text="${cliente.telefono}">987654321</span>
+                                </a>
+                            </span>
+                            <span th:if="${cliente.telefono == null}" class="text-muted small">No registrado</span>
+                        </td>
+                        <td th:text="${#temporals.format(cliente.fechaInscripcion, 'dd/MM/yyyy')}">27/08/2026</td>
+                        <td class="text-end">
+                            <div class="btn-group">
+                                <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <a th:href="@{/clientes/eliminar/{id}(id=${cliente.id})}" class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('¿Está seguro de eliminar este cliente y sus registros asociados?');" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(clientes)}">
+                        <td colspan="6" class="text-center text-muted py-4">No se encontraron clientes registrados.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Controles de Paginación y Ordenamiento -->
+            <div class="card-footer bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2" th:if="${totalPaginas > 1}">
+                <div class="small text-muted">
+                    Mostrando página <strong th:text="${paginaActual + 1}">1</strong> de <strong th:text="${totalPaginas}">1</strong> (<span th:text="${totalElementos}">10</span> socios en total)
+                </div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" th:classappend="${paginaActual == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/clientes(pagina=${paginaActual - 1}, buscar=${buscar}, ordenarPor=${ordenarPor}, direccion=${direccion})}">
+                                <i class="bi bi-chevron-left"></i> Anterior
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}" th:classappend="${i == paginaActual} ? 'active'">
+                            <a class="page-link" th:href="@{/clientes(pagina=${i}, buscar=${buscar}, ordenarPor=${ordenarPor}, direccion=${direccion})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${paginaActual + 1 >= totalPaginas} ? 'disabled'">
+                            <a class="page-link" th:href="@{/clientes(pagina=${paginaActual + 1}, buscar=${buscar}, ordenarPor=${ordenarPor}, direccion=${direccion})}">
+                                Siguiente <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

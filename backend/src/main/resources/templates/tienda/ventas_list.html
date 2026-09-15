@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(titulo='Historial de Ventas - Tienda')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-1">
+                <i class="bi bi-receipt-cutoff text-danger me-2"></i> Historial de Ventas de la Tienda
+            </h1>
+            <p class="text-secondary small mb-0">Registro y comprobantes emitidos de suplementos, bebidas y accesorios.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/tienda}" class="btn btn-danger fw-bold shadow-sm">
+                <i class="bi bi-cart-plus-fill me-1"></i> Ir a Caja / POS
+            </a>
+        </div>
+    </div>
+
+    <!-- Total de Ventas de Hoy -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 p-3 bg-white" style="border-radius: 12px; border-left: 5px solid #198754 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Ventas Registradas Hoy</div>
+                        <h2 class="h3 fw-bold text-success mb-0" th:text="${'S/ ' + (totalVentasHoy != null ? totalVentasHoy : '0.00')}">S/ 0.00</h2>
+                    </div>
+                    <div class="bg-success-subtle text-success p-3 rounded-circle fs-3">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Ventas -->
+    <div class="card shadow-sm border-0" style="border-radius: 14px; overflow: hidden;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>N° Comprobante</th>
+                            <th>Fecha y Hora</th>
+                            <th>Cliente / Comprador</th>
+                            <th>Atendido Por</th>
+                            <th>Método de Pago</th>
+                            <th>Productos</th>
+                            <th class="text-end">Total Cobrado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="v : ${ventas}">
+                            <td>
+                                <span class="badge bg-dark font-monospace px-2 py-1" th:text="${v.codigoComprobante}">TKT-000001</span>
+                            </td>
+                            <td class="fw-semibold text-dark" th:text="${#temporals.format(v.fechaHora, 'dd/MM/yyyy HH:mm:ss')}">02/09/2026 22:15:00</td>
+                            <td>
+                                <span th:if="${v.cliente != null}" class="fw-bold text-dark" th:text="${v.cliente.nombreCompleto}">Juan Perez</span>
+                                <span th:if="${v.cliente == null}" class="badge bg-secondary">Público General</span>
+                            </td>
+                            <td>
+                                <span class="small text-muted" th:text="${v.usuario != null ? v.usuario.nombre : 'Recepción'}">Staff</span>
+                            </td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${v.metodoPago == 'YAPE' ? 'bg-primary' : (v.metodoPago == 'EFECTIVO' ? 'bg-success' : 'bg-dark')}"
+                                      th:text="${v.metodoPago}">
+                                    YAPE
+                                </span>
+                            </td>
+                            <td class="small">
+                                <ul class="list-unstyled mb-0">
+                                    <li th:each="d : ${v.detalles}">
+                                        <span class="fw-bold" th:text="${d.cantidad} + 'x'">1x</span>
+                                        <span th:text="${d.producto.nombre}">Proteína Whey</span>
+                                        <span class="text-muted" th:text="'(S/ ' + ${d.subtotal} + ')'">(S/ 185.00)</span>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td class="text-end fw-bold fs-6 text-danger" th:text="${'S/ ' + v.total}">
+                                S/ 185.00
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(ventas)}">
+                            <td colspan="7" class="text-center text-muted py-5">
+                                <i class="bi bi-receipt fs-1 d-block mb-2 text-secondary"></i>
+                                Aún no se han registrado ventas en la tienda.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

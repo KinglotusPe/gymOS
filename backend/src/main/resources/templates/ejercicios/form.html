@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo=${ejercicio.id == null ? 'Nuevo Ejercicio' : 'Editar Ejercicio'})}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h1 class="h3 fw-bold text-dark mb-0" th:text="${ejercicio.id == null ? 'Nuevo Ejercicio' : 'Editar Ejercicio'}">Nuevo Ejercicio</h1>
+                    <p class="text-secondary small mb-0">Biblioteca multimedia de técnicas y ejercicios</p>
+                </div>
+                <a th:href="@{/ejercicios}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Volver al Catálogo
+                </a>
+            </div>
+
+            <div class="card shadow-sm border-0" style="border-radius: 14px;">
+                <div class="card-body p-4">
+                    <form th:action="@{/ejercicios/guardar}" th:object="${ejercicio}" method="post">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold small">Nombre del Ejercicio <span class="text-danger">*</span></label>
+                                <input type="text" th:field="*{nombre}" class="form-control" placeholder="Ej: Press de Banca Plano con Barra" required />
+                                <div class="text-danger small" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Grupo Muscular <span class="text-danger">*</span></label>
+                                <select th:field="*{grupoMuscular}" class="form-select" required>
+                                    <option value="" disabled selected>-- Seleccione --</option>
+                                    <option value="PECHO">Pecho</option>
+                                    <option value="ESPALDA">Espalda</option>
+                                    <option value="PIERNAS">Piernas</option>
+                                    <option value="HOMBROS">Hombros</option>
+                                    <option value="BRAZOS">Brazos (Bíceps/Tríceps)</option>
+                                    <option value="ABDOMEN">Abdomen / Core</option>
+                                    <option value="CARDIO">Cardio / Funcional</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Categoría</label>
+                                <select th:field="*{categoria}" class="form-select">
+                                    <option value="Fuerza">Fuerza</option>
+                                    <option value="Hipertrofia">Hipertrofia</option>
+                                    <option value="Resistencia">Resistencia</option>
+                                    <option value="Cardio">Cardio</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Nivel</label>
+                                <select th:field="*{nivel}" class="form-select">
+                                    <option value="PRINCIPIANTE">Principiante</option>
+                                    <option value="INTERMEDIO">Intermedio</option>
+                                    <option value="AVANZADO">Avanzado</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Equipamiento</label>
+                                <input type="text" th:field="*{equipamiento}" class="form-control" placeholder="Ej: Barra Olímpica, Mancuernas" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">URL de Imagen (Estática)</label>
+                                <input type="url" th:field="*{imagenUrl}" class="form-control" placeholder="https://..." />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">URL de Animación GIF (Técnica en movimiento)</label>
+                                <input type="url" th:field="*{gifUrl}" class="form-control" placeholder="https://..." />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold small">Instrucciones de Ejecución / Técnica</label>
+                                <textarea th:field="*{instrucciones}" class="form-control" rows="4" placeholder="1. Acuéstate sobre el banco plano...&#10;2. Baja la barra controladamente hacia el pecho..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <a th:href="@{/ejercicios}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-danger fw-bold px-4">
+                                <i class="bi bi-check-circle me-1"></i> Guardar Ejercicio
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

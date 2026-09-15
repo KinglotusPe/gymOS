@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo=${rutina.id == null ? 'Nueva Rutina' : 'Editar Rutina'})}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 800px; border-radius: 14px; overflow: hidden;">
+        <div class="card-header bg-dark text-white p-4 border-bottom border-danger border-2" style="background-color: #111827 !important;">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-journal-plus text-danger fs-3 me-3"></i>
+                <div>
+                    <h1 class="h5 fw-bold mb-0">
+                        <span th:text="${rutina.id == null ? 'Asignar Nueva Rutina de Entrenamiento' : 'Editar Rutina'}"></span>
+                    </h1>
+                    <small class="text-secondary">Selecciona los ejercicios visuales con sus animaciones GIF correspondientes</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4 p-md-5 bg-white">
+            <form th:action="@{/rutinas/guardar}" th:object="${rutina}" method="post">
+                <input type="hidden" th:field="*{id}" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-dark small">Cliente / Alumno Asignado *</label>
+                    <select th:field="*{cliente}" class="form-select" required>
+                        <option value="">-- Seleccione un cliente --</option>
+                        <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nombreCompleto + ' (DNI: ' + c.dni + ')'}"></option>
+                    </select>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('cliente')}" th:errors="*{cliente}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-dark small">Entrenador a Cargo:</label>
+                    <select th:field="*{entrenador}" class="form-select">
+                        <option value="">-- Staff General --</option>
+                        <option th:each="e : ${entrenadores}" th:value="${e.id}" th:text="${e.nombreCompleto + ' (' + e.especialidad + ')'}"></option>
+                    </select>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark small">Nombre del Plan *</label>
+                        <input type="text" th:field="*{nombre}" class="form-control" placeholder="Ej: Hipertrofia y Fuerza Torso" required />
+                        <div class="text-danger small" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark small">Día / Grupo Muscular *</label>
+                        <input type="text" th:field="*{diaSemana}" class="form-control" placeholder="Ej: Lunes - Pecho y Tríceps" required />
+                        <div class="text-danger small" th:if="${#fields.hasErrors('diaSemana')}" th:errors="*{diaSemana}"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-dark small">Nivel de Exigencia:</label>
+                    <select th:field="*{nivel}" class="form-select">
+                        <option value="Principiante">Principiante (Adaptación)</option>
+                        <option value="Intermedio">Intermedio (Hipertrofia)</option>
+                        <option value="Avanzado / Atleta">Avanzado / Atleta (Fuerza Máxima)</option>
+                    </select>
+                </div>
+
+                <!-- Selector Visual de Ejercicios del Banco de Datos -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-dark small">
+                        <i class="bi bi-collection-play-fill text-danger me-1"></i> Seleccionar Ejercicios de la Biblioteca (GIFs Animados):
+                    </label>
+                    <p class="text-muted small mb-2">Marca los ejercicios que formarán parte de esta rutina:</p>
+
+                    <div class="border rounded-3 p-3 bg-light" style="max-height: 260px; overflow-y: auto;">
+                        <div class="row g-2">
+                            <div class="col-md-6" th:each="ej : ${ejerciciosDisponibles}">
+                                <div class="form-check card p-2 h-100 bg-white shadow-sm border-0">
+                                    <input class="form-check-input ms-0 me-2" type="checkbox" 
+                                           name="ejerciciosSeleccionados" 
+                                           th:value="${ej.id}" 
+                                           th:id="'ejCheck_' + ${ej.id}">
+                                    <label class="form-check-label d-flex align-items-center gap-2 cursor-pointer" th:for="'ejCheck_' + ${ej.id}">
+                                        <img th:src="${ej.gifUrl != null ? ej.gifUrl : ej.imagenUrl}" 
+                                             alt="" 
+                                             class="rounded bg-dark" 
+                                             style="width: 45px; height: 45px; object-fit: contain;">
+                                        <div>
+                                            <strong class="d-block small text-dark" th:text="${ej.nombre}">Press de Banca</strong>
+                                            <span class="badge bg-danger" style="font-size: 0.7rem;" th:text="${ej.grupoMuscular}">Pecho</span>
+                                            <span class="badge bg-secondary" style="font-size: 0.7rem;" th:text="${ej.equipamiento}">Máquina</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-dark small">Detalle de Series, Reps y Pesos Sugeridos *</label>
+                    <textarea th:field="*{ejercicios}" rows="3" class="form-control" 
+                              placeholder="Ej:&#10;1. Press en Smith: 4 series x 10 reps (60 kg)&#10;2. Fondos: 3 series al fallo&#10;3. Curl Bíceps: 3 series x 12 reps" required></textarea>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('ejercicios')}" th:errors="*{ejercicios}"></div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-dark small">Observaciones y Recomendaciones:</label>
+                    <input type="text" th:field="*{observaciones}" class="form-control" placeholder="Ej: Calentar 10 min en trotadora y descansar 60s entre series." />
+                </div>
+
+                <div class="d-flex justify-content-between gap-2 pt-2">
+                    <a th:href="@{/rutinas}" class="btn btn-outline-secondary px-4 fw-semibold">
+                        <i class="bi bi-arrow-left me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm">
+                        <i class="bi bi-check-lg me-1"></i> Guardar Rutina
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

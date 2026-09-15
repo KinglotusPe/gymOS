@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Formulario Entrenador')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="card shadow-sm border-0 p-4 mx-auto" style="max-width: 750px; border-radius: 12px;">
+        <div class="border-bottom pb-3 mb-4">
+            <h2 class="h4 fw-bold text-dark mb-1">
+                <i class="bi bi-person-badge-fill text-danger me-2"></i>
+                <span th:text="${entrenador.id} != null ? 'Editar Entrenador' : 'Registrar Nuevo Entrenador'"></span>
+            </h2>
+            <p class="text-muted small mb-0">Ingresa la información profesional del personal de BRUTAL FITNESS</p>
+        </div>
+
+        <form th:action="@{/entrenadores/guardar}" th:object="${entrenador}" method="post" class="row g-3">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">DNI <span class="text-danger">*</span></label>
+                <input type="text" th:field="*{dni}" class="form-control" placeholder="Ej: 70123456" required maxlength="15">
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Especialidad <span class="text-danger">*</span></label>
+                <select th:field="*{especialidad}" class="form-select" required>
+                    <option value="">-- Selecciona especialidad --</option>
+                    <option value="Musculación y Fuerza">Musculación y Fuerza</option>
+                    <option value="Crossfit / Funcional">Crossfit / Funcional</option>
+                    <option value="Calistenia / Peso Corporal">Calistenia / Peso Corporal</option>
+                    <option value="Spinning / Cardio">Spinning / Cardio</option>
+                    <option value="Box y Artes Marciales">Box y Artes Marciales</option>
+                    <option value="Acondicionamiento Físico">Acondicionamiento Físico</option>
+                    <option value="Nutrición Deportiva">Nutrición Deportiva</option>
+                </select>
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('especialidad')}" th:errors="*{especialidad}"></div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Nombres <span class="text-danger">*</span></label>
+                <input type="text" th:field="*{nombres}" class="form-control" placeholder="Ej: Juan Carlos" required maxlength="100">
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Apellidos <span class="text-danger">*</span></label>
+                <input type="text" th:field="*{apellidos}" class="form-control" placeholder="Ej: Perez Quispe" required maxlength="100">
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Teléfono / WhatsApp</label>
+                <input type="text" th:field="*{telefono}" class="form-control" placeholder="Ej: 987654321" maxlength="20">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Correo Electrónico</label>
+                <input type="email" th:field="*{correo}" class="form-control" placeholder="Ej: entrenador@brutalfitness.pe" maxlength="100">
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Estado</label>
+                <select th:field="*{estado}" class="form-select">
+                    <option value="ACTIVO">ACTIVO</option>
+                    <option value="INACTIVO">INACTIVO</option>
+                </select>
+            </div>
+
+            <div class="col-12 mt-4 border-top pt-3 d-flex gap-2">
+                <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                    <i class="bi bi-save me-1"></i> Guardar Entrenador
+                </button>
+                <a th:href="@{/entrenadores}" class="btn btn-outline-secondary px-3">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

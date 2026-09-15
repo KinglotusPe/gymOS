@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Membresías')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-0">Gestión de Membresías y Planes</h1>
+            <p class="text-secondary small mb-0">Control de vigencias, renovaciones y cálculo dinámico de vencimientos</p>
+        </div>
+        <a th:href="@{/membresias/nuevo}" class="btn btn-danger fw-bold shadow-sm">
+            <i class="bi bi-card-checklist me-1"></i> + Nueva Membresía
+        </a>
+    </div>
+
+    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 12px;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Cliente / Socio</th>
+                        <th>Plan / Modalidad</th>
+                        <th>Fecha de Inicio</th>
+                        <th>Fecha de Vencimiento</th>
+                        <th>Estado Actual</th>
+                        <th>Aviso WhatsApp</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="m : ${membresias}">
+                        <td>
+                            <strong class="text-dark" th:text="${m.cliente.nombreCompleto}">Juan Perez</strong>
+                            <div class="text-muted small">DNI: <span th:text="${m.cliente.dni}">72345678</span></div>
+                        </td>
+                        <td>
+                            <span class="badge bg-dark px-2 py-1" th:text="${m.tipo}">MENSUAL</span>
+                        </td>
+                        <td th:text="${#temporals.format(m.fechaInicio, 'dd/MM/yyyy')}">01/08/2026</td>
+                        <td class="fw-bold" th:text="${#temporals.format(m.fechaVencimiento, 'dd/MM/yyyy')}">31/08/2026</td>
+                        <td>
+                            <span th:class="${m.estado.name() == 'ACTIVA' ? 'badge bg-success' : 'badge bg-danger'}" 
+                                  th:text="${m.estado}">ACTIVA</span>
+                        </td>
+                        <td>
+                            <span th:if="${m.cliente.telefono != null}">
+                                <a th:href="@{'https://wa.me/51' + ${m.cliente.telefono} + '?text=' + ${#uris.escapePath('Hola ' + m.cliente.nombres + ', te saludamos de BRUTAL FITNESS para recordarte sobre tu membresía ' + m.tipo + ' con vencimiento al ' + #temporals.format(m.fechaVencimiento, 'dd/MM/yyyy') + '.')}}" 
+                                   target="_blank" class="btn btn-sm btn-outline-success fw-bold">
+                                    <i class="bi bi-whatsapp"></i> Avisar
+                                </a>
+                            </span>
+                            <span th:if="${m.cliente.telefono == null}" class="text-muted small">-</span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group">
+                                <a th:href="@{/membresias/editar/{id}(id=${m.id})}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <a th:href="@{/membresias/eliminar/{id}(id=${m.id})}" class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('¿Está seguro de eliminar este registro de membresía?');" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(membresias)}">
+                        <td colspan="7" class="text-center text-muted py-4">No hay membresías registradas en el sistema.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

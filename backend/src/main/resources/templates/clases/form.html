@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(titulo='Programar Clase Grupal')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+
+            <div class="card shadow-sm border-0" style="border-radius: 14px; overflow: hidden;">
+                <div class="card-header bg-dark text-white p-4 border-bottom border-danger border-2" style="background-color: #111827 !important;">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-calendar-plus-fill text-danger fs-3 me-3"></i>
+                        <div>
+                            <h1 class="h4 fw-bold mb-0">Programar Clase Grupal</h1>
+                            <small class="text-secondary">Define la disciplina, fecha, horario, salón y cupo máximo de aforo</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form th:action="@{/clases/guardar}" th:object="${clase}" method="post">
+                        <input type="hidden" th:field="*{id}" />
+
+                        <!-- Disciplina -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark small">Disciplina Deportiva *</label>
+                            <select th:field="*{disciplina}" class="form-select" required>
+                                <option value="" disabled selected>-- Seleccione Disciplina --</option>
+                                <option th:each="d : ${disciplinas}" th:value="${d.id}" th:text="${d.nombre} + ' (' + ${d.intensidad} + ')'"></option>
+                            </select>
+                        </div>
+
+                        <!-- Entrenador / Instructor -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark small">Instructor a Cargo *</label>
+                            <select th:field="*{entrenador}" class="form-select" required>
+                                <option value="" disabled selected>-- Seleccione Instructor --</option>
+                                <option th:each="e : ${entrenadores}" th:value="${e.id}" th:text="${e.nombreCompleto} + ' - ' + ${e.especialidad}"></option>
+                            </select>
+                        </div>
+
+                        <!-- Salon -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark small">Salón o Área *</label>
+                            <input type="text" th:field="*{salon}" class="form-control" placeholder="Ej: Sala 1 - Spinning, Box Crossfit, Salón de Baile" required />
+                        </div>
+
+                        <!-- Fecha y Aforo -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-dark small">Fecha de la Clase *</label>
+                                <input type="date" th:field="*{fecha}" class="form-control" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-dark small">Cupo Máximo de Alumnos *</label>
+                                <input type="number" th:field="*{cupoMaximo}" class="form-control" min="1" max="50" placeholder="Ej: 20" required />
+                            </div>
+                        </div>
+
+                        <!-- Horarios -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-dark small">Hora de Inicio *</label>
+                                <input type="time" th:field="*{horaInicio}" class="form-control" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-dark small">Hora de Fin *</label>
+                                <input type="time" th:field="*{horaFin}" class="form-control" required />
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between gap-2 pt-2">
+                            <a th:href="@{/clases}" class="btn btn-outline-secondary px-4 fw-semibold">
+                                <i class="bi bi-arrow-left me-1"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger px-4 fw-bold shadow-sm">
+                                <i class="bi bi-check-lg me-1"></i> Guardar Clase
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

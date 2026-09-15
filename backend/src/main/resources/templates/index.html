@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(titulo='Panel de Control')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <!-- Header de Bienvenida y Accesos Rápidos -->
+    <div class="card shadow-sm border-0 mb-4 p-4" style="background: #ffffff; border-radius: 12px; border-left: 5px solid #dc3545 !important;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <img th:src="@{/img/logo.png}" alt="BRUTAL FITNESS" class="rounded-2 shadow-sm p-1 border bg-white" style="height: 52px; width: auto; object-fit: contain;">
+                <div>
+                    <h1 class="h3 fw-bold text-dark mb-0">
+                        Panel de Control — <span class="text-danger">BRUTAL FITNESS</span>
+                    </h1>
+                    <p class="text-muted mb-0 small mt-1">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> Jr. José Santos Chocano 980, Distrito de Jesús Nazareno — Ayacucho
+                    </p>
+                </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a th:href="@{/asistencias/control-acceso}" class="btn btn-danger fw-bold shadow-sm">
+                    <i class="bi bi-upc-scan me-1"></i> ⚡ Check-in Rápido
+                </a>
+                <a th:href="@{/seguimientos/nuevo}" class="btn btn-outline-danger fw-semibold">
+                    <i class="bi bi-activity me-1"></i> + Nueva Evaluación
+                </a>
+                <a th:href="@{/clientes/nuevo}" class="btn btn-dark fw-semibold">
+                    <i class="bi bi-person-plus-fill me-1"></i> + Nuevo Cliente
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicadores / Métricas en Tarjetas -->
+    <div class="row g-3 mb-4">
+        <!-- Clientes Activos -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; border-top: 4px solid #0d6efd !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Clientes Registrados</div>
+                        <h2 class="display-6 fw-bold text-dark mt-2 mb-0" th:text="${totalClientes}">0</h2>
+                    </div>
+                    <div class="bg-primary-subtle text-primary p-3 rounded-circle fs-3">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Membresias Activas -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; border-top: 4px solid #198754 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Membresías Activas</div>
+                        <h2 class="display-6 fw-bold text-success mt-2 mb-0" th:text="${membresiasActivas}">0</h2>
+                    </div>
+                    <div class="bg-success-subtle text-success p-3 rounded-circle fs-3">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Por Vencer -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; border-top: 4px solid #ffc107 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Por Vencer (7 días)</div>
+                        <h2 class="display-6 fw-bold text-warning mt-2 mb-0" th:text="${membresiasPorVencer}">0</h2>
+                    </div>
+                    <div class="bg-warning-subtle text-warning p-3 rounded-circle fs-3">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Membresias Vencidas -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; border-top: 4px solid #dc3545 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Membresías Vencidas</div>
+                        <h2 class="display-6 fw-bold text-danger mt-2 mb-0" th:text="${membresiasVencidas}">0</h2>
+                    </div>
+                    <div class="bg-danger-subtle text-danger p-3 rounded-circle fs-3">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recaudacion del Mes -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; border-top: 4px solid #0dcaf0 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Recaudación del Mes</div>
+                        <h2 class="fs-3 fw-bold text-primary mt-2 mb-0">S/ <span th:text="${totalMes != null ? totalMes : '0.00'}">0.00</span></h2>
+                    </div>
+                    <div class="bg-info-subtle text-info p-3 rounded-circle fs-3">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Asistencias de Hoy -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; border-top: 4px solid #212529 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Asistencias Hoy</div>
+                        <h2 class="display-6 fw-bold text-dark mt-2 mb-0" th:text="${asistenciasHoy}">0</h2>
+                    </div>
+                    <div class="bg-dark-subtle text-dark p-3 rounded-circle fs-3">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entrenadores Activos -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; border-top: 4px solid #6f42c1 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Entrenadores Staff</div>
+                        <h2 class="display-6 fw-bold text-dark mt-2 mb-0" th:text="${totalEntrenadores}">0</h2>
+                    </div>
+                    <div class="bg-primary-subtle text-primary p-3 rounded-circle fs-3" style="color: #6f42c1 !important; background-color: #e2d9f3 !important;">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evaluaciones Fisicas -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-0 h-100 p-3" style="border-radius: 12px; border-top: 4px solid #fd7e14 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Fichas de Progreso</div>
+                        <h2 class="display-6 fw-bold text-dark mt-2 mb-0" th:text="${totalSeguimientos}">0</h2>
+                    </div>
+                    <div class="bg-warning-subtle text-warning p-3 rounded-circle fs-3" style="color: #fd7e14 !important; background-color: #ffe5d0 !important;">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN DE GRÁFICOS ANALÍTICOS (CHART.JS) -->
+    <div class="row g-3 mb-4">
+        <!-- Gráfico 1: Evolución de Ingresos -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h6 fw-bold text-dark mb-0">
+                        <i class="bi bi-graph-up-arrow text-danger me-2"></i> Recaudación Financiera Anual (Soles S/)
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartIngresosCanvas" style="max-height: 260px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico 2: Horas Punta de Asistencia -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h6 fw-bold text-dark mb-0">
+                        <i class="bi bi-bar-chart-line-fill text-danger me-2"></i> Horas Punta de Asistencia
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <canvas id="chartHorasCanvas" style="max-height: 260px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tablas Resumen de Alertas -->
+    <div class="row g-3">
+        <!-- Membresías por Vencer con Alerta WhatsApp -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h2 class="h6 fw-bold text-dark mb-0">
+                        <i class="bi bi-bell-fill text-warning me-2"></i> Membresías Próximas a Vencer
+                    </h2>
+                    <a th:href="@{/membresias}" class="btn btn-sm btn-outline-secondary">Ver Todas</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Plan</th>
+                                <th>Vence</th>
+                                <th class="text-end">Recordatorio</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="m : ${proximasAVencer}">
+                                <td>
+                                    <div class="fw-bold" th:text="${m.cliente.nombreCompleto}">Juan Perez</div>
+                                    <div class="text-muted small">DNI: <span th:text="${m.cliente.dni}">72345678</span></div>
+                                </td>
+                                <td><span class="badge bg-dark" th:text="${m.tipo}">MENSUAL</span></td>
+                                <td class="fw-bold text-warning" th:text="${#temporals.format(m.fechaVencimiento, 'dd/MM/yyyy')}">30/08/2026</td>
+                                <td class="text-end">
+                                    <a th:if="${m.cliente.telefono != null}" 
+                                       th:href="@{'https://wa.me/51' + ${m.cliente.telefono} + '?text=' + ${#uris.escapePath('Hola ' + m.cliente.nombres + ', te saludamos de BRUTAL FITNESS para recordarte que tu membresía ' + m.tipo + ' vence el ' + #temporals.format(m.fechaVencimiento, 'dd/MM/yyyy') + '. ¡Te esperamos para seguir entrenando!')}}" 
+                                       target="_blank" class="btn btn-sm btn-success fw-bold" title="Avisar por WhatsApp">
+                                        <i class="bi bi-whatsapp"></i> Avisar
+                                    </a>
+                                    <span th:if="${m.cliente.telefono == null}" class="text-muted small">Sin teléfono</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(proximasAVencer)}">
+                                <td colspan="4" class="text-center text-muted py-3">No hay membresías por vencer en los próximos 7 días.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Últimos Ingresos de Hoy -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h2 class="h6 fw-bold text-dark mb-0">
+                        <i class="bi bi-clock-history text-danger me-2"></i> Flujo de Ingresos de Hoy
+                    </h2>
+                    <a th:href="@{/asistencias}" class="btn btn-sm btn-outline-secondary">Ver Todas</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Cliente</th>
+                                <th>DNI</th>
+                                <th>Hora</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="a, iter : ${ultimasAsistencias}">
+                                <td class="text-muted fw-semibold" th:text="${iter.count}">1</td>
+                                <td class="fw-bold" th:text="${a.cliente.nombreCompleto}">Juan Perez</td>
+                                <td th:text="${a.cliente.dni}">72345678</td>
+                                <td class="fw-bold text-primary" th:text="${#temporals.format(a.fechaHora, 'HH:mm:ss')}">10:30:00</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(ultimasAsistencias)}">
+                                <td colspan="4" class="text-center text-muted py-3">No hay asistencias registradas hoy.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts de Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const chartMesesLabels = /*[[${chartMeses}]]*/ ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'];
+    const chartIngresosData = /*[[${chartIngresos}]]*/ [395, 440, 485, 530, 575, 620, 665, 405, 0, 0, 0, 0];
+
+    const ctxIngresos = document.getElementById('chartIngresosCanvas').getContext('2d');
+    new Chart(ctxIngresos, {
+        type: 'line',
+        data: {
+            labels: chartMesesLabels,
+            datasets: [{
+                label: 'Recaudación (S/)',
+                data: chartIngresosData,
+                backgroundColor: 'rgba(220, 53, 69, 0.15)',
+                borderColor: '#dc3545',
+                borderWidth: 2.5,
+                fill: true,
+                tension: 0.35,
+                pointBackgroundColor: '#dc3545',
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) { return 'S/ ' + value; }
+                    }
+                }
+            }
+        }
+    });
+
+    const chartHorasLabels = /*[[${chartHorasLabels}]]*/ ['06:00 - 09:00', '09:00 - 12:00', '12:00 - 16:00', '16:00 - 19:00', '19:00 - 22:00'];
+    const chartHorasData = /*[[${chartHorasFlujo}]]*/ [18, 12, 8, 35, 42];
+
+    const ctxHoras = document.getElementById('chartHorasCanvas').getContext('2d');
+    new Chart(ctxHoras, {
+        type: 'bar',
+        data: {
+            labels: chartHorasLabels,
+            datasets: [{
+                label: 'Afluencia de Clientes',
+                data: chartHorasData,
+                backgroundColor: '#111827',
+                hoverBackgroundColor: '#dc3545',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+    /*]]>*/
+</script>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

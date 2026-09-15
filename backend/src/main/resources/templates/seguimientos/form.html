@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Ficha de Evaluación Física')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="card shadow-sm border-0 p-4 mx-auto" style="max-width: 800px; border-radius: 12px;">
+        <div class="border-bottom pb-3 mb-4">
+            <h2 class="h4 fw-bold text-dark mb-1">
+                <i class="bi bi-activity text-danger me-2"></i>
+                <span th:text="${seguimiento.id} != null ? 'Editar Ficha Antropométrica' : 'Nueva Ficha Antropométrica / Medidas'"></span>
+            </h2>
+            <p class="text-muted small mb-0">Control de peso, porcentaje de grasa y masa muscular para los socios de BRUTAL FITNESS</p>
+        </div>
+
+        <form th:action="@{/seguimientos/guardar}" th:object="${seguimiento}" method="post" class="row g-3">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Cliente <span class="text-danger">*</span></label>
+                <select th:field="*{cliente}" class="form-select" required>
+                    <option value="">-- Seleccione Cliente --</option>
+                    <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nombreCompleto}"></option>
+                </select>
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('cliente')}" th:errors="*{cliente}"></div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Entrenador a Cargo</label>
+                <select th:field="*{entrenador}" class="form-select">
+                    <option value="">-- Ninguno / Opcional --</option>
+                    <option th:each="e : ${entrenadores}" th:value="${e.id}" th:text="${e.nombreCompleto + ' (' + e.especialidad + ')'}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Fecha de Registro <span class="text-danger">*</span></label>
+                <input type="date" th:field="*{fechaRegistro}" class="form-control" required>
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('fechaRegistro')}" th:errors="*{fechaRegistro}"></div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Peso (kg) <span class="text-danger">*</span></label>
+                <input type="number" step="0.1" th:field="*{pesoKg}" class="form-control" placeholder="Ej: 75.5" required>
+                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('pesoKg')}" th:errors="*{pesoKg}"></div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Altura (cm)</label>
+                <input type="number" step="0.5" th:field="*{alturaCm}" class="form-control" placeholder="Ej: 175.0">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">% Grasa Corporal</label>
+                <input type="number" step="0.1" th:field="*{porcentajeGrasa}" class="form-control" placeholder="Ej: 18.2">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Masa Muscular (kg)</label>
+                <input type="number" step="0.1" th:field="*{masaMuscular}" class="form-control" placeholder="Ej: 35.8">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Objetivo Principal</label>
+                <select th:field="*{objetivo}" class="form-select">
+                    <option value="Hipertrofia / Ganancia Muscular">Hipertrofia / Ganancia Muscular</option>
+                    <option value="Definición / Pérdida de Grasa">Definición / Pérdida de Grasa</option>
+                    <option value="Acondicionamiento / Fuerza">Acondicionamiento / Fuerza</option>
+                    <option value="Salud y Mantenimiento">Salud y Mantenimiento</option>
+                </select>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-bold">Observaciones / Recomendaciones</label>
+                <textarea th:field="*{observaciones}" class="form-control" rows="2" placeholder="Ej: Mantener dieta alta en proteínas y 4 sesiones semanales de pesas."></textarea>
+            </div>
+
+            <div class="col-12 mt-4 border-top pt-3 d-flex gap-2">
+                <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                    <i class="bi bi-save me-1"></i> Guardar Evaluación
+                </button>
+                <a th:href="@{/seguimientos}" class="btn btn-outline-secondary px-3">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

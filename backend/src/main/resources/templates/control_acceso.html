@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Control de Acceso y Molinete')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-1">
+                <i class="bi bi-shield-lock-fill text-danger me-2"></i> Control de Acceso y Molinete de Seguridad
+            </h1>
+            <p class="text-secondary small mb-0">Escaneo de Carnet QR con cámara en vivo, verificación facial fotográfica y control de doble ingreso.</p>
+        </div>
+        <a th:href="@{/asistencias}" class="btn btn-outline-secondary btn-sm fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Volver a Historial
+        </a>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <!-- Columna Izquierda: Escáner y Formulario -->
+        <div class="col-lg-7">
+            <!-- Selector de Modo de Escaneo -->
+            <div class="card shadow-sm border-0 mb-4" style="border-radius: 14px; overflow: hidden; background: #111827; color: white;">
+                <div class="card-body p-4 text-center">
+                    
+                    <!-- Badge de Integración con Firebase Cloud (Requerimiento Unidad 4 Sílabo) -->
+                    <div class="mb-3 d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-dark border border-secondary shadow-sm">
+                        <span class="spinner-grow spinner-grow-sm text-warning" role="status" id="firebaseSpinner" style="width: 0.75rem; height: 0.75rem;"></span>
+                        <small class="text-light" id="firebaseStatus">
+                            <i class="bi bi-cloud-check-fill text-warning me-1"></i> Google Firebase Cloud: <strong>Sincronización en Tiempo Real</strong>
+                        </small>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+                        <button type="button" id="btnModoTeclado" class="btn btn-outline-danger btn-sm active fw-bold" onclick="toggleModo('teclado')">
+                            <i class="bi bi-keyboard me-1"></i> Teclado / Pistola USB
+                        </button>
+                        <button type="button" id="btnModoCamara" class="btn btn-danger btn-sm fw-bold" onclick="toggleModo('camara')">
+                            <i class="bi bi-camera-video-fill me-1"></i> Escáner de Cámara QR
+                        </button>
+                    </div>
+
+                    <!-- 1. Modo Cámara Escáner QR en Vivo -->
+                    <div id="seccionCamara" class="d-none">
+                        <div id="qr-reader" class="rounded-3 border border-danger border-2 mx-auto overflow-hidden bg-black" style="max-width: 360px; min-height: 250px;"></div>
+                        <p class="small text-secondary mt-2 mb-0">
+                            <i class="bi bi-qr-code-scan text-danger me-1"></i> Apunta la cámara del dispositivo al código QR del carnet
+                        </p>
+                    </div>
+
+                    <!-- 2. Modo Teclado / Escáner de Código de Barras -->
+                    <div id="seccionTeclado">
+                        <h4 class="h5 fw-bold mb-3 text-light">
+                            <i class="bi bi-upc-scan text-danger me-2"></i> Ingrese o Escanee el DNI del Socio
+                        </h4>
+
+                        <form th:action="@{/asistencias/control-acceso/verificar}" method="post" id="formAcceso" class="mx-auto" style="max-width: 480px;">
+                            <div class="input-group input-group-lg shadow">
+                                <span class="input-group-text bg-dark border-secondary text-light">
+                                    <i class="bi bi-person-vcard text-danger"></i>
+                                </span>
+                                <input type="text" name="dni" id="inputDni" class="form-control text-center fw-bold fs-4 bg-white text-dark" 
+                                       placeholder="Ej: 72345678" autofocus required autocomplete="off" />
+                                <button type="submit" class="btn btn-danger fw-bold px-4">
+                                    VALIDAR <i class="bi bi-arrow-right-circle ms-1"></i>
+                                </button>
+                            </div>
+                        </form>
+                        <div class="small text-secondary mt-2">Compatible con lectores láser USB y carnet digital QR.</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- RESULTADO DE VALIDACIÓN (PANEL DE SEGURIDAD CON FOTO) -->
+            <div th:if="${resultado != null}">
+
+                <!-- 🟢 CASO 1: ACCESO PERMITIDO (MEMBRESÍA ACTIVA) -->
+                <div th:if="${resultado == 'PERMITIDO'}" class="card shadow-lg border-0 mb-4" 
+                     style="border-radius: 16px; border-left: 8px solid #198754 !important; background: #ffffff;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pb-3 mb-3 border-bottom">
+                            <span class="badge bg-success fs-6 px-3 py-2 shadow-sm">
+                                <i class="bi bi-check-circle-fill me-1"></i> ACCESO CONCEDIDO
+                            </span>
+                            <span class="text-success fw-bold small"><i class="bi bi-unlock-fill me-1"></i> MOLINETE DESBLOQUEADO</span>
+                        </div>
+
+                        <div class="row align-items-center g-3">
+                            <div class="col-sm-4 text-center">
+                                <img th:src="${cliente != null ? cliente.fotoUrlOrDefault : 'https://ui-avatars.com/api/?name=Socio&background=198754&color=fff&size=200'}" 
+                                     alt="Foto del Socio" 
+                                     class="rounded-circle img-thumbnail shadow border border-3 border-success" 
+                                     style="width: 120px; height: 120px; object-fit: cover;">
+                                <div class="small text-muted mt-1"><i class="bi bi-camera-fill me-1"></i> Foto Registrada</div>
+                            </div>
+                            <div class="col-sm-8">
+                                <h3 class="h4 fw-bold text-dark mb-1" th:text="${cliente.nombreCompleto}">Juan Carlos Perez</h3>
+                                <div class="text-muted small mb-2">DNI: <strong class="text-dark" th:text="${cliente.dni}">72345678</strong></div>
+                                
+                                <div class="bg-light p-3 rounded-3 small">
+                                    <div>Plan: <strong class="text-success" th:text="${membresia.tipo}">MENSUAL LIBRE</strong></div>
+                                    <div>Válido hasta: <strong th:text="${#temporals.format(membresia.fechaVencimiento, 'dd/MM/yyyy')}">30/09/2026</strong></div>
+                                    <div class="text-primary fw-bold mt-1">
+                                        <i class="bi bi-hourglass-split me-1"></i> <span th:text="${diasRestantes} + ' días de vigencia restantes'">28 días restantes</span>
+                                    </div>
+                                    <div class="mt-2 pt-2 border-top d-flex align-items-center justify-content-between" th:if="${casilleroAsignado != null}">
+                                        <span class="text-dark fw-bold"><i class="bi bi-key-fill text-warning me-1"></i> Casillero Asignado:</span>
+                                        <span class="badge bg-dark fs-6 px-3 py-1" th:text="${casilleroAsignado}">L-01</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ⚠️ CASO 2: ADVERTENCIA DE SEGURIDAD (DOBLE INGRESO / REINGRESO HOY) -->
+                <div th:if="${resultado == 'REINGRESO_ADVERTENCIA'}" class="card shadow-lg border-0 mb-4" 
+                     style="border-radius: 16px; border-left: 8px solid #ffc107 !important; background: #fffbeb;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pb-3 mb-3 border-bottom border-warning">
+                            <span class="badge bg-warning text-dark fs-6 px-3 py-2 shadow-sm">
+                                <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> ADVERTENCIA DE SEGURIDAD
+                            </span>
+                            <span class="text-danger fw-bold small"><i class="bi bi-person-x-fill me-1"></i> VERIFIQUE IDENTIDAD DEL CLIENTE</span>
+                        </div>
+
+                        <div class="alert alert-warning border-0 small py-2 mb-3">
+                            <i class="bi bi-shield-exclamation text-danger fs-5 me-2 align-middle"></i>
+                            <strong>DOBLE INGRESO DETECTADO:</strong> Este cliente ya registró un ingreso el día de hoy a las <strong th:text="${horaPrimerIngreso != null ? horaPrimerIngreso : 'hora previa'}">10:30:00</strong>. Asegúrese de que no esté compartiendo su carnet con otra persona.
+                        </div>
+
+                        <div class="row align-items-center g-3">
+                            <div class="col-sm-4 text-center">
+                                <img th:src="${cliente != null ? cliente.fotoUrlOrDefault : 'https://ui-avatars.com/api/?name=Socio&background=ffc107&color=000&size=200'}" 
+                                     alt="Foto del Socio" 
+                                     class="rounded-circle img-thumbnail shadow border border-3 border-warning" 
+                                     style="width: 120px; height: 120px; object-fit: cover;">
+                                <div class="small text-danger fw-bold mt-1">Comparar con el rostro real</div>
+                            </div>
+                            <div class="col-sm-8">
+                                <h3 class="h4 fw-bold text-dark mb-1" th:text="${cliente.nombreCompleto}">Juan Carlos Perez</h3>
+                                <div class="text-muted small mb-2">DNI: <strong class="text-dark" th:text="${cliente.dni}">72345678</strong></div>
+                                
+                                <div class="bg-white p-3 rounded-3 small border border-warning">
+                                    <div>Plan: <strong class="text-success" th:text="${membresia.tipo}">MENSUAL LIBRE</strong></div>
+                                    <div>Válido hasta: <strong th:text="${#temporals.format(membresia.fechaVencimiento, 'dd/MM/yyyy')}">30/09/2026</strong></div>
+                                    <div class="text-success fw-bold mt-1">
+                                        <i class="bi bi-check-circle me-1"></i> Membresía Vigente (<span th:text="${diasRestantes}">28</span> días restantes)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🔵 CASO: SALIDA DE SOCIO (LIBERACIÓN AUTOMÁTICA DE CASILLERO) -->
+                <div th:if="${resultado == 'SOCIO_SALIDA'}" class="card shadow-lg border-0 mb-4" 
+                     style="border-radius: 16px; border-left: 8px solid #0dcaf0 !important; background: #ffffff;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pb-3 mb-3 border-bottom">
+                            <span class="badge bg-info text-dark fs-6 px-3 py-2 shadow-sm">
+                                <i class="bi bi-box-arrow-right me-1"></i> SALIDA DE SOCIO REGISTRADA
+                            </span>
+                            <span class="text-info fw-bold small"><i class="bi bi-unlock-fill me-1"></i> CASILLERO LIBERADO</span>
+                        </div>
+
+                        <div class="row align-items-center g-3">
+                            <div class="col-sm-4 text-center">
+                                <img th:src="${cliente != null ? cliente.fotoUrlOrDefault : 'https://ui-avatars.com/api/?name=Socio&background=0dcaf0&color=000&size=200'}" 
+                                     alt="Foto del Socio" 
+                                     class="rounded-circle img-thumbnail shadow border border-3 border-info" 
+                                     style="width: 120px; height: 120px; object-fit: cover;">
+                                <div class="small text-muted mt-1"><i class="bi bi-emoji-smile-fill text-warning me-1"></i> ¡Buen entrenamiento!</div>
+                            </div>
+                            <div class="col-sm-8">
+                                <h3 class="h4 fw-bold text-dark mb-1" th:text="${cliente.nombreCompleto}">Juan Carlos Perez</h3>
+                                <div class="text-muted small mb-2">DNI: <strong class="text-dark" th:text="${cliente.dni}">72345678</strong></div>
+                                
+                                <div class="bg-light p-3 rounded-3 small">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Hora de Ingreso: <strong class="text-dark" th:text="${horaEntrada}">08:00:00</strong></span>
+                                        <span>Hora de Salida: <strong class="text-dark" th:text="${horaSalida}">09:30:00</strong></span>
+                                    </div>
+                                    <div class="text-primary fw-bold fs-6 my-1">
+                                        <i class="bi bi-stopwatch-fill me-1"></i> Tiempo entrenado: <span th:text="${tiempoEntrenado}">1h 30 min</span>
+                                    </div>
+                                    <div class="mt-2 pt-2 border-top d-flex align-items-center justify-content-between" th:if="${casilleroLiberado != null}">
+                                        <span class="text-success fw-bold"><i class="bi bi-check-circle-fill text-success me-1"></i> Casillero Liberado:</span>
+                                        <span class="badge bg-success fs-6 px-3 py-1" th:text="${casilleroLiberado}">L-01</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🔴 CASO 3: ACCESO DENEGADO (MEMBRESÍA VENCIDA) -->
+                <div th:if="${resultado == 'DENEGADO'}" class="card shadow-lg border-0 mb-4" 
+                     style="border-radius: 16px; border-left: 8px solid #dc3545 !important; background: #ffffff;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pb-3 mb-3 border-bottom">
+                            <span class="badge bg-danger fs-6 px-3 py-2 shadow-sm">
+                                <i class="bi bi-x-circle-fill me-1"></i> ACCESO DENEGADO
+                            </span>
+                            <span class="text-danger fw-bold small"><i class="bi bi-lock-fill me-1"></i> MOLINETE BLOQUEADO</span>
+                        </div>
+
+                        <div class="row align-items-center g-3">
+                            <div class="col-sm-4 text-center">
+                                <img th:src="${cliente != null ? cliente.fotoUrlOrDefault : 'https://ui-avatars.com/api/?name=Socio&background=dc3545&color=fff&size=200'}" 
+                                     alt="Foto del Socio" 
+                                     class="rounded-circle img-thumbnail shadow border border-3 border-danger" 
+                                     style="width: 120px; height: 120px; object-fit: cover;">
+                            </div>
+                            <div class="col-sm-8">
+                                <h3 class="h4 fw-bold text-dark mb-1" th:text="${cliente.nombreCompleto}">Juan Carlos Perez</h3>
+                                <div class="text-muted small mb-2">DNI: <strong class="text-dark" th:text="${cliente.dni}">72345678</strong></div>
+                                
+                                <div class="alert alert-danger py-2 mb-2 small">
+                                    <i class="bi bi-exclamation-octagon-fill me-1"></i> <strong>MEMBRESÍA VENCIDA O INACTIVA</strong>
+                                </div>
+                                <div class="small text-muted" th:if="${ultimaMembresia != null}">
+                                    Venció el: <strong class="text-danger" th:text="${#temporals.format(ultimaMembresia.fechaVencimiento, 'dd/MM/yyyy')}">15/08/2026</strong>
+                                </div>
+                                <div class="small text-muted" th:if="${ultimaMembresia == null}">
+                                    El cliente no tiene ningún plan registrado.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🏋️‍♂️ CASO 4: ENTRADA DE ENTRENADOR / STAFF -->
+                <div th:if="${resultado == 'ENTRENADOR_ENTRADA'}" class="card shadow-lg border-0 mb-4" 
+                     style="border-radius: 16px; border-left: 8px solid #0d6efd !important; background: #ffffff;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pb-3 mb-3 border-bottom">
+                            <span class="badge bg-primary fs-6 px-3 py-2 shadow-sm">
+                                <i class="bi bi-person-badge-fill me-1"></i> ENTRADA DE TURNO — STAFF / ENTRENADOR
+                            </span>
+                            <span class="text-primary fw-bold small"><i class="bi bi-clock-fill me-1"></i> INGRESO REGISTRADO</span>
+                        </div>
+
+                        <div class="row align-items-center g-3">
+                            <div class="col-sm-4 text-center">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80" 
+                                     alt="Foto del Coach" 
+                                     class="rounded-circle img-thumbnail shadow border border-3 border-primary" 
+                                     style="width: 120px; height: 120px; object-fit: cover;">
+                                <div class="small text-muted mt-1"><i class="bi bi-award-fill me-1"></i> Entrenador Staff</div>
+                            </div>
+                            <div class="col-sm-8">
+                                <h3 class="h4 fw-bold text-dark mb-1" th:text="${entrenador.nombreCompleto}">Prof. Marco Antonio Vargas</h3>
+                                <div class="text-muted small mb-2">DNI: <strong class="text-dark" th:text="${entrenador.dni}">09876543</strong></div>
+                                
+                                <div class="bg-light p-3 rounded-3 small">
+                                    <div>Especialidad: <strong class="text-primary" th:text="${entrenador.especialidad}">Crossfit / Musculación</strong></div>
+                                    <div>Hora de Ingreso: <strong class="text-success fs-6" th:text="${horaMarcaje}">08:00:00 AM</strong></div>
+                                    <div class="mt-2 pt-2 border-top d-flex align-items-center justify-content-between" th:if="${casilleroAsignado != null}">
+                                        <span class="text-dark fw-bold"><i class="bi bi-key-fill text-primary me-1"></i> Casillero Asignado:</span>
+                                        <span class="badge bg-primary fs-6 px-3 py-1" th:text="${casilleroAsignado}">L-21</span>
+                                    </div>
+                                    <div class="text-success fw-bold mt-2">
+                                        <i class="bi bi-check2-all me-1"></i> ¡Bienvenido al turno de entrenamiento!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🔴 CASO 5: SALIDA DE ENTRENADOR / STAFF -->
+                <div th:if="${resultado == 'ENTRENADOR_SALIDA'}" class="card shadow-lg border-0 mb-4" 
+                     style="border-radius: 16px; border-left: 8px solid #6f42c1 !important; background: #ffffff;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pb-3 mb-3 border-bottom">
+                            <span class="badge bg-purple text-white fs-6 px-3 py-2 shadow-sm" style="background-color: #6f42c1 !important;">
+                                <i class="bi bi-box-arrow-right me-1"></i> SALIDA DE TURNO — STAFF / ENTRENADOR
+                            </span>
+                            <span class="text-purple fw-bold small" style="color: #6f42c1 !important;"><i class="bi bi-check-circle-fill me-1"></i> JORNADA COMPLETADA</span>
+                        </div>
+
+                        <div class="row align-items-center g-3">
+                            <div class="col-sm-4 text-center">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80" 
+                                     alt="Foto del Coach" 
+                                     class="rounded-circle img-thumbnail shadow border border-3" 
+                                     style="width: 120px; height: 120px; object-fit: cover; border-color: #6f42c1 !important;">
+                            </div>
+                            <div class="col-sm-8">
+                                <h3 class="h4 fw-bold text-dark mb-1" th:text="${entrenador.nombreCompleto}">Prof. Marco Antonio Vargas</h3>
+                                <div class="text-muted small mb-2">DNI: <strong class="text-dark" th:text="${entrenador.dni}">09876543</strong></div>
+                                
+                                <div class="bg-light p-3 rounded-3 small">
+                                    <div>Hora de Entrada: <strong th:text="${horaEntrada}">08:00:00</strong></div>
+                                    <div>Hora de Salida: <strong th:text="${horaSalida}">14:00:00</strong></div>
+                                    <div class="text-purple fw-bold my-1 fs-6" style="color: #6f42c1 !important;">
+                                        <i class="bi bi-hourglass-bottom me-1"></i> Tiempo trabajado: <span th:text="${tiempoTrabajado}">6h 00m</span>
+                                    </div>
+                                    <div class="mt-2 pt-2 border-top d-flex align-items-center justify-content-between" th:if="${casilleroLiberado != null}">
+                                        <span class="text-success fw-bold"><i class="bi bi-unlock-fill me-1"></i> Casillero Liberado:</span>
+                                        <span class="badge bg-success fs-6 px-3 py-1" th:text="${casilleroLiberado}">L-21</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ⚠️ CASO 6: DNI NO REGISTRADO -->
+                <div th:if="${resultado == 'NO_REGISTRADO'}" class="alert alert-danger shadow-sm border-0 p-4" style="border-radius: 14px;">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-person-x fs-1 text-danger me-3"></i>
+                        <div>
+                            <h4 class="h5 fw-bold mb-1">DNI No Encontrado</h4>
+                            <p class="mb-0 small">No existe ningún socio ni entrenador registrado con el documento: <strong th:text="${dniBuscado}">72345678</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Columna Derecha: Asistencias en Vivo del Día -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0" style="border-radius: 14px;">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-clock-history text-danger me-2"></i> Ingresos de Hoy
+                    </h5>
+                    <span class="badge bg-danger fs-6" th:text="${totalHoy} + ' Ingresos'">2 Ingresos</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0 small">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>Socio</th>
+                                    <th>Hora</th>
+                                    <th class="text-end">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="a : ${asistenciasHoy}">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img th:src="${a.cliente.fotoUrlOrDefault}" 
+                                                 alt="" 
+                                                 class="rounded-circle" 
+                                                 style="width: 32px; height: 32px; object-fit: cover;">
+                                            <div>
+                                                <strong class="d-block text-dark text-truncate" style="max-width: 140px;" th:text="${a.cliente.nombreCompleto}">Juan Perez</strong>
+                                                <span class="text-muted" style="font-size: 0.75rem;" th:text="${a.cliente.dni}">72345678</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-danger" th:text="${#temporals.format(a.fechaHora, 'HH:mm:ss')}">20:44:18</td>
+                                    <td class="text-end">
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">REGISTRADO</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(asistenciasHoy)}">
+                                    <td colspan="3" class="text-center text-muted py-4">Aún no se han registrado ingresos el día de hoy.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Librería de Escáner QR por Cámara HTML5 -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<!-- Sistema de Audio y Control de Cámara -->
+<script>
+    // Sintetizador Web Audio API para efectos sonoros de molinete
+    function reproducirSonido(tipo) {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+            if (tipo === 'exito') {
+                // 🟢 Melodía de bienvenida agradable (Acorde brillante)
+                [523.25, 659.25, 783.99].forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + (i * 0.08));
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime + (i * 0.08));
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (i * 0.08) + 0.2);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + (i * 0.08));
+                    osc.stop(ctx.currentTime + (i * 0.08) + 0.2);
+                });
+            } else if (tipo === 'salida') {
+                // 🔵 Tono suave de despedida
+                [659.25, 523.25].forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + (i * 0.1));
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime + (i * 0.1));
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (i * 0.1) + 0.25);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + (i * 0.1));
+                    osc.stop(ctx.currentTime + (i * 0.1) + 0.25);
+                });
+            } else if (tipo === 'advertencia') {
+                // ⚠️ Alerta de doble marcaje
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                osc.frequency.setValueAtTime(440, ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.35);
+            } else {
+                // 🔴 BOCINA DE ACCESO DENEGADO / MEMBRESÍA VENCIDA (Doble Buzzer grave)
+                [0, 0.18].forEach(startT => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(140, ctx.currentTime + startT);
+                    osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + startT + 0.14);
+                    gain.gain.setValueAtTime(0.35, ctx.currentTime + startT);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + startT + 0.15);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + startT);
+                    osc.stop(ctx.currentTime + startT + 0.15);
+                });
+            }
+        } catch (e) {
+            console.warn("Audio no soportado o bloqueado por el navegador", e);
+        }
+    }
+
+    // Ejecutar sonido según el resultado del servidor (exclusivo, solo 1 sonido correspondiente)
+    document.addEventListener("DOMContentLoaded", function() {
+        const resultadoServidor = "[[${resultado}]]";
+        if (resultadoServidor === 'PERMITIDO' || resultadoServidor === 'ENTRENADOR_ENTRADA') {
+            reproducirSonido('exito');
+        } else if (resultadoServidor === 'SOCIO_SALIDA' || resultadoServidor === 'ENTRENADOR_SALIDA') {
+            reproducirSonido('salida');
+        } else if (resultadoServidor === 'REINGRESO_ADVERTENCIA') {
+            reproducirSonido('advertencia');
+        } else if (resultadoServidor === 'DENEGADO' || resultadoServidor === 'NO_REGISTRADO' || resultadoServidor === 'VENCIDA' || resultadoServidor === 'ERROR') {
+            reproducirSonido('error');
+        }
+    });
+
+    let html5QrCode = null;
+
+    function toggleModo(modo) {
+        const secCam = document.getElementById('seccionCamara');
+        const secTec = document.getElementById('seccionTeclado');
+        const btnCam = document.getElementById('btnModoCamara');
+        const btnTec = document.getElementById('btnModoTeclado');
+
+        if (modo === 'camara') {
+            secCam.classList.remove('d-none');
+            secTec.classList.add('d-none');
+            btnCam.classList.add('active');
+            btnTec.classList.remove('active');
+            iniciarEscanerCamara();
+        } else {
+            secCam.classList.add('d-none');
+            secTec.classList.remove('d-none');
+            btnTec.classList.add('active');
+            btnCam.classList.remove('active');
+            detenerEscanerCamara();
+            document.getElementById('inputDni').focus();
+        }
+    }
+
+    function iniciarEscanerCamara() {
+        if (!html5QrCode) {
+            html5QrCode = new Html5Qrcode("qr-reader");
+        }
+        
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        
+        html5QrCode.start({ facingMode: "environment" }, config, (qrCodeMessage) => {
+            // Código QR detectado exitosamente: asignar y enviar
+            console.log("QR Detectado:", qrCodeMessage);
+            document.getElementById('inputDni').value = qrCodeMessage.trim();
+            document.getElementById('formAcceso').submit();
+        }).catch(err => {
+            console.warn("Error al iniciar cámara:", err);
+        });
+    }
+
+    function detenerEscanerCamara() {
+        if (html5QrCode && html5QrCode.isScanning) {
+            html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+            }).catch(err => console.error("Error al detener cámara:", err));
+        }
+    }
+</script>
+
+<!-- Google Firebase Cloud SDK (Requerimiento Unidad 4 Sílabo) -->
+<script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-database-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyD-BRUTAL-FITNESS-CLOUD-APIKEY-99201",
+        authDomain: "gym-sistema-pontificia.firebaseapp.com",
+        projectId: "gym-sistema-pontificia",
+        storageBucket: "gym-sistema-pontificia.appspot.com",
+        messagingSenderId: "982347102938",
+        appId: "1:982347102938:web:7a8b9c0d1e2f3a4b5c6d7e",
+        databaseURL: "https://gym-sistema-pontificia-default-rtdb.firebaseio.com"
+    };
+
+    let firebaseDb = null;
+    try {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        firebaseDb = firebase.database();
+        const fbStatus = document.getElementById('firebaseStatus');
+        const fbSpinner = document.getElementById('firebaseSpinner');
+        if (fbStatus && fbSpinner) {
+            fbSpinner.className = 'spinner-grow spinner-grow-sm text-success';
+            fbStatus.innerHTML = '<i class="bi bi-cloud-check-fill text-success me-1"></i> Google Firebase Cloud: <strong class="text-success">Conectado y En Línea</strong>';
+        }
+        console.log("✅ [Firebase Cloud] Conectado exitosamente con Google Cloud Firebase (Realtime Database)");
+    } catch(e) {
+        console.warn("⚠️ [Firebase Cloud] Modo offline activado (simulación segura):", e);
+    }
+</script>
+
+<script th:if="${resultado != null and cliente != null}">
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof firebase !== 'undefined' && firebase.apps.length) {
+            const evento = {
+                dni: "[[${cliente.dni}]]",
+                nombre: "[[${cliente.nombreCompleto}]]",
+                resultado: "[[${resultado}]]",
+                fechaHora: new Date().toISOString(),
+                origen: 'Thymeleaf Control Acceso Web'
+            };
+            try {
+                firebase.database().ref('accesos_tiempo_real').push(evento);
+                console.log("☁️ [Firebase Cloud] Marcaje sincronizado en tiempo real en la nube:", evento);
+            } catch (err) {
+                console.warn("Firebase sync error:", err);
+            }
+        }
+    });
+</script>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

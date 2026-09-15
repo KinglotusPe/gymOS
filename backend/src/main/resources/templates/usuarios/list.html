@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Gestión de Usuarios y Roles')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-0">Gestión de Usuarios y Permisos</h1>
+            <p class="text-secondary small mb-0">Administración de cuentas de acceso, roles y contraseñas</p>
+        </div>
+        <a th:href="@{/usuarios/nuevo}" class="btn btn-danger fw-bold shadow-sm">
+            <i class="bi bi-person-plus-fill me-1"></i> + Crear Usuario
+        </a>
+    </div>
+
+    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 12px;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre Completo</th>
+                        <th>Usuario / DNI</th>
+                        <th>Rol Asignado</th>
+                        <th>Vínculo</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u, iter : ${usuarios}">
+                        <td class="text-muted fw-semibold" th:text="${iter.count}">1</td>
+                        <td class="fw-bold text-dark" th:text="${u.nombre}">César Luza</td>
+                        <td>
+                            <code class="fw-bold text-primary" th:text="${u.username}">admin</code>
+                        </td>
+                        <td>
+                            <span th:if="${u.rol.name() == 'ROLE_ADMIN'}" class="badge bg-danger">👑 ADMIN</span>
+                            <span th:if="${u.rol.name() == 'ROLE_RECEPCIONISTA'}" class="badge bg-primary">💼 RECEPCIÓN</span>
+                            <span th:if="${u.rol.name() == 'ROLE_ENTRENADOR'}" class="badge bg-dark">🏋️‍♂️ ENTRENADOR</span>
+                            <span th:if="${u.rol.name() == 'ROLE_CLIENTE'}" class="badge bg-success">👤 CLIENTE</span>
+                        </td>
+                        <td>
+                            <span th:if="${u.cliente != null}" th:text="${'Socio: ' + u.cliente.nombreCompleto}" class="small text-muted"></span>
+                            <span th:if="${u.entrenador != null}" th:text="${'Staff: ' + u.entrenador.nombreCompleto}" class="small text-muted"></span>
+                            <span th:if="${u.cliente == null && u.entrenador == null}" class="small text-muted">Sistema Directo</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/usuarios/toggle/{id}(id=${u.id})}" 
+                               th:class="${u.activo ? 'badge bg-success text-decoration-none' : 'badge bg-secondary text-decoration-none'}">
+                                <i th:class="${u.activo ? 'bi bi-check-circle-fill me-1' : 'bi bi-dash-circle me-1'}"></i>
+                                <span th:text="${u.activo ? 'ACTIVO' : 'INACTIVO'}">ACTIVO</span>
+                            </a>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group">
+                                <a th:href="@{/usuarios/editar/{id}(id=${u.id})}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <a th:href="@{/usuarios/eliminar/{id}(id=${u.id})}" class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('¿Está seguro de eliminar esta cuenta de usuario?');" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(usuarios)}">
+                        <td colspan="7" class="text-center text-muted py-4">No hay cuentas de usuario registradas.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

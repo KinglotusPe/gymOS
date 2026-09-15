@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo=${usuario.id == null ? 'Nuevo Usuario' : 'Editar Usuario'})}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5 mt-3">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 600px; border-radius: 14px; overflow: hidden;">
+        <div class="card-header bg-dark text-white p-3 border-bottom border-danger border-2" style="background-color: #111827 !important;">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="h5 fw-bold mb-0">
+                    <i class="bi bi-person-gear text-danger me-2"></i>
+                    <span th:text="${usuario.id == null ? 'Registrar Nueva Cuenta de Usuario' : 'Editar Cuenta de Usuario'}"></span>
+                </span>
+                <span class="badge bg-danger" th:text="${usuario.id == null ? 'NUEVO' : 'ID: ' + usuario.id}">NUEVO</span>
+            </div>
+        </div>
+
+        <div class="card-body p-4 bg-white">
+            <form th:action="@{/usuarios/guardar}" th:object="${usuario}" method="post" id="formUsuario">
+                <input type="hidden" th:field="*{id}" />
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                <!-- Rol en el Sistema (Paso Principal) -->
+                <div class="mb-3 p-3 bg-light rounded-3 border">
+                    <label class="form-label fw-bold text-dark mb-1">
+                        <i class="bi bi-shield-lock-fill text-danger me-1"></i> Tipo de Rol / Nivel de Acceso *
+                    </label>
+                    <select th:field="*{rol}" id="selectRol" class="form-select fw-semibold" required onchange="actualizarCamposPorRol()">
+                        <option value="">-- Seleccione un Rol --</option>
+                        <option value="ROLE_ADMIN">🛡️ Administrador (Acceso Total y Reportes)</option>
+                        <option value="ROLE_RECEPCIONISTA">💼 Recepcionista (Caja, Asistencias y POS)</option>
+                        <option value="ROLE_ENTRENADOR">🏋️‍♂️ Entrenador / Coach (Rutinas y Progreso)</option>
+                        <option value="ROLE_CLIENTE">📱 Cliente / Socio (Portal Móvil y Carnet QR)</option>
+                    </select>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}"></div>
+                </div>
+
+                <!-- Campo Dinámico: Vincular a Socio (Solo visible si es ROLE_CLIENTE) -->
+                <div class="mb-3 p-3 bg-primary-subtle rounded-3 border border-primary-subtle" id="boxVincularCliente" style="display: none;">
+                    <label class="form-label fw-bold text-primary mb-1">
+                        <i class="bi bi-person-badge-fill me-1"></i> Selecciona al Socio para crearle su cuenta:
+                    </label>
+                    <select th:field="*{cliente}" id="selectCliente" class="form-select" onchange="autoCompletarDesdeCliente()">
+                        <option value="">-- Seleccione el Cliente registrado --</option>
+                        <option th:each="c : ${clientes}" 
+                                th:value="${c.id}" 
+                                th:data-nombre="${c.nombreCompleto}"
+                                th:data-dni="${c.dni}"
+                                th:text="${c.nombreCompleto + ' (DNI: ' + c.dni + ')'}"></option>
+                    </select>
+                    <small class="text-muted d-block mt-1">El socio podrá ver su Carnet QR y rutinas con este usuario.</small>
+                </div>
+
+                <!-- Campo Dinámico: Vincular a Entrenador (Solo visible si es ROLE_ENTRENADOR) -->
+                <div class="mb-3 p-3 bg-success-subtle rounded-3 border border-success-subtle" id="boxVincularEntrenador" style="display: none;">
+                    <label class="form-label fw-bold text-success mb-1">
+                        <i class="bi bi-person-workspace me-1"></i> Selecciona al Coach para crearle su cuenta:
+                    </label>
+                    <select th:field="*{entrenador}" id="selectEntrenador" class="form-select" onchange="autoCompletarDesdeEntrenador()">
+                        <option value="">-- Seleccione el Entrenador --</option>
+                        <option th:each="e : ${entrenadores}" 
+                                th:value="${e.id}" 
+                                th:data-nombre="${e.nombreCompleto}"
+                                th:data-dni="${e.dni}"
+                                th:text="${e.nombreCompleto + ' (' + e.especialidad + ')'}"></option>
+                    </select>
+                    <small class="text-muted d-block mt-1">El coach podrá registrar avances físicos y rutinas de sus alumnos.</small>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark">Nombre Completo *</label>
+                        <input type="text" th:field="*{nombre}" id="inputNombre" class="form-control" placeholder="Ej: César Luza" required />
+                        <div class="text-danger small" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark">Usuario / DNI para Login *</label>
+                        <input type="text" th:field="*{username}" id="inputUsername" class="form-control" placeholder="Ej: admin, 72345678" required />
+                        <div class="text-danger small" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-dark">Contraseña *</label>
+                    <input type="password" th:field="*{password}" class="form-control" placeholder="••••••••" required />
+                    <small class="text-muted">Se encripta de forma segura con BCrypt en la base de datos.</small>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input type="checkbox" th:field="*{activo}" class="form-check-input" id="activoCheck" />
+                    <label class="form-check-label fw-semibold text-dark" for="activoCheck">Cuenta Habilitada / Activa</label>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a th:href="@{/usuarios}" class="btn btn-outline-secondary fw-bold">
+                        <i class="bi bi-arrow-left me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger fw-bold px-4 py-2 shadow-sm">
+                        <i class="bi bi-check-circle-fill me-1"></i> Guardar Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function actualizarCamposPorRol() {
+        const rol = document.getElementById('selectRol').value;
+        const boxCliente = document.getElementById('boxVincularCliente');
+        const boxEntrenador = document.getElementById('boxVincularEntrenador');
+        const selectCliente = document.getElementById('selectCliente');
+        const selectEntrenador = document.getElementById('selectEntrenador');
+
+        if (rol === 'ROLE_CLIENTE') {
+            boxCliente.style.display = 'block';
+            boxEntrenador.style.display = 'none';
+            selectEntrenador.value = '';
+        } else if (rol === 'ROLE_ENTRENADOR') {
+            boxCliente.style.display = 'none';
+            boxEntrenador.style.display = 'block';
+            selectCliente.value = '';
+        } else {
+            // ROLE_ADMIN o ROLE_RECEPCIONISTA (Staff administrativo)
+            boxCliente.style.display = 'none';
+            boxEntrenador.style.display = 'none';
+            selectCliente.value = '';
+            selectEntrenador.value = '';
+        }
+    }
+
+    function autoCompletarDesdeCliente() {
+        const select = document.getElementById('selectCliente');
+        const selectedOpt = select.options[select.selectedIndex];
+        if (selectedOpt && selectedOpt.value) {
+            const nombre = selectedOpt.getAttribute('data-nombre');
+            const dni = selectedOpt.getAttribute('data-dni');
+            if (nombre) document.getElementById('inputNombre').value = nombre;
+            if (dni) document.getElementById('inputUsername').value = dni;
+        }
+    }
+
+    function autoCompletarDesdeEntrenador() {
+        const select = document.getElementById('selectEntrenador');
+        const selectedOpt = select.options[select.selectedIndex];
+        if (selectedOpt && selectedOpt.value) {
+            const nombre = selectedOpt.getAttribute('data-nombre');
+            const dni = selectedOpt.getAttribute('data-dni');
+            if (nombre) document.getElementById('inputNombre').value = nombre;
+            if (dni) document.getElementById('inputUsername').value = dni;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        actualizarCamposPorRol();
+    });
+</script>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

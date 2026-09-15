@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Entrenadores')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-person-badge-fill text-danger me-2"></i>Entrenadores y Personal Trainer
+            </h2>
+            <p class="text-muted small mb-0">Gestión del staff deportivo y especialistas de BRUTAL FITNESS</p>
+        </div>
+        <a th:href="@{/entrenadores/nuevo}" class="btn btn-danger fw-semibold">
+            <i class="bi bi-plus-circle me-1"></i> + Nuevo Entrenador
+        </a>
+    </div>
+
+    <!-- Alertas Flash -->
+    <div class="alert alert-success alert-dismissible fade show" th:if="${success}">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" th:if="${error}">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>DNI</th>
+                        <th>Nombres y Apellidos</th>
+                        <th>Especialidad</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="e : ${entrenadores}">
+                        <td class="fw-semibold text-muted" th:text="${e.id}">1</td>
+                        <td class="fw-bold text-dark" th:text="${e.dni}">70123456</td>
+                        <td th:text="${e.nombreCompleto}">Carlos Mendoza</td>
+                        <td>
+                            <span class="badge bg-dark px-2 py-1" th:text="${e.especialidad}">Musculación</span>
+                        </td>
+                        <td th:text="${e.telefono != null && !e.telefono.isEmpty() ? e.telefono : '-'}">987654321</td>
+                        <td th:text="${e.correo != null && !e.correo.isEmpty() ? e.correo : '-'}">carlos@email.com</td>
+                        <td>
+                            <span th:class="${e.estado == 'ACTIVO' ? 'badge bg-success' : 'badge bg-secondary'}" th:text="${e.estado}">ACTIVO</span>
+                        </td>
+                        <td class="text-center">
+                            <a th:href="@{/entrenadores/editar/{id}(id=${e.id})}" class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a th:href="@{/entrenadores/eliminar/{id}(id=${e.id})}" class="btn btn-sm btn-outline-danger" title="Eliminar"
+                               onclick="return confirm('¿Seguro que deseas eliminar este entrenador?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(entrenadores)}">
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                            No hay entrenadores registrados. Haz clic en <strong>+ Nuevo Entrenador</strong>.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' - BRUTAL FITNESS'">BRUTAL FITNESS</title>
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 py-2 border-bottom border-danger border-3 shadow-sm" style="background-color: #111827 !important;">
+    <div class="container">
+        <!-- Logo Oficial Reconstruido -->
+        <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/}">
+            <img th:src="@{/img/logo.png}" alt="BRUTAL FITNESS LOGO" class="rounded-2 shadow-sm bg-white p-1" style="height: 42px; width: auto; object-fit: contain;">
+            <div>
+                <div class="d-flex align-items-baseline">
+                    <span class="fw-black tracking-wider text-white" style="font-weight: 900; letter-spacing: 1px;">BRUTAL</span>
+                    <span class="fw-black text-danger ms-1" style="font-weight: 900; letter-spacing: 1px;">FITNESS</span>
+                </div>
+                <span class="d-block text-secondary small" style="font-size: 0.7rem; letter-spacing: 0.5px;">TRANSFORMANDO CUERPO, ALMA Y MENTE</span>
+            </div>
+        </a>
+
+        <!-- Botón Móvil -->
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ms-auto gap-lg-2 align-items-lg-center">
+
+                <!-- ======================================================= -->
+                <!-- 1. VISTA ADMINISTRADOR Y RECEPCIÓN (MENÚS AGRUPADOS)    -->
+                <!-- ======================================================= -->
+                
+                <!-- Acceso Directo: Inicio / Dashboard -->
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/}">
+                        <i class="bi bi-grid-fill me-1 text-danger"></i> Inicio
+                    </a>
+                </li>
+
+                <!-- Grupo 1: Mostrador / Operaciones Diarias -->
+                <li class="nav-item dropdown" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
+                    <a class="nav-link dropdown-toggle px-2 text-white fw-semibold" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-clipboard-check-fill me-1 text-danger"></i> Mostrador
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark shadow border-0" style="background-color: #1e293b; border-radius: 12px;">
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Atención & Socios</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/clientes}">
+                                <i class="bi bi-people-fill text-danger me-2"></i> Clientes / Socios
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/membresias}">
+                                <i class="bi bi-card-checklist text-danger me-2"></i> Planes de Membresía
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider border-secondary opacity-50"></li>
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Control & Local</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/asistencias}">
+                                <i class="bi bi-qr-code-scan text-danger me-2"></i> Asistencias / Molinete QR
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/casilleros}">
+                                <i class="bi bi-grid-3x3-gap-fill text-danger me-2"></i> Mapa de Casilleros / Lockers
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Grupo 2: Ventas, Caja & Finanzas -->
+                <li class="nav-item dropdown" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
+                    <a class="nav-link dropdown-toggle px-2 text-white fw-semibold" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-cash-coin me-1 text-danger"></i> Finanzas
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark shadow border-0" style="background-color: #1e293b; border-radius: 12px;">
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Ventas & Cobranza</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/tienda}">
+                                <i class="bi bi-shop text-danger me-2"></i> Tienda / Punto de Venta
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/pagos}">
+                                <i class="bi bi-receipt text-danger me-2"></i> Historial de Pagos & Boletas
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider border-secondary opacity-50"></li>
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Flujo de Dinero</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/caja}">
+                                <i class="bi bi-wallet2 text-danger me-2"></i> Control de Caja & Arqueo
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Grupo 3: Fitness & Área Deportiva -->
+                <li class="nav-item dropdown" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA')">
+                    <a class="nav-link dropdown-toggle px-2 text-white fw-semibold" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-activity me-1 text-danger"></i> Fitness
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark shadow border-0" style="background-color: #1e293b; border-radius: 12px;">
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Planes de Entrenamiento</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/rutinas}">
+                                <i class="bi bi-journal-text text-danger me-2"></i> Rutinas de Entrenamiento
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/ejercicios}">
+                                <i class="bi bi-collection-play-fill text-danger me-2"></i> Banco de Ejercicios
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/seguimientos}">
+                                <i class="bi bi-heart-pulse-fill text-danger me-2"></i> Evaluaciones & Progreso
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider border-secondary opacity-50"></li>
+                        <li><h6 class="dropdown-header text-uppercase text-secondary fw-bold" style="font-size: 0.7rem;">Staff & Horarios</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/entrenadores}">
+                                <i class="bi bi-person-badge-fill text-danger me-2"></i> Entrenadores / Coaches
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 text-white" th:href="@{/clases}">
+                                <i class="bi bi-calendar-week-fill text-danger me-2"></i> Calendario de Clases
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- ======================================================= -->
+                <!-- 2. VISTA EXCLUSIVA PARA ENTRENADORES (COACHES)         -->
+                <!-- ======================================================= -->
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_ENTRENADOR')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/seguimientos}">
+                        <i class="bi bi-heart-pulse-fill me-1 text-danger"></i> Progreso de Alumnos
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_ENTRENADOR')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/rutinas}">
+                        <i class="bi bi-journal-text me-1 text-danger"></i> Rutinas
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_ENTRENADOR')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/ejercicios}">
+                        <i class="bi bi-collection-play-fill me-1 text-danger"></i> Ejercicios
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_ENTRENADOR')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/clases}">
+                        <i class="bi bi-calendar-week-fill me-1 text-danger"></i> Mis Clases
+                    </a>
+                </li>
+
+                <!-- ======================================================= -->
+                <!-- 3. VISTA EXCLUSIVA PARA CLIENTES / SOCIOS              -->
+                <!-- ======================================================= -->
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_CLIENTE')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/portal/mi-cuenta}">
+                        <i class="bi bi-person-badge-fill me-1 text-danger"></i> Mi Carnet / QR
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_CLIENTE')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/clases}">
+                        <i class="bi bi-calendar-check-fill me-1 text-danger"></i> Reservar Clases
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_CLIENTE')">
+                    <a class="nav-link px-2 text-white fw-semibold" th:href="@{/ejercicios}">
+                        <i class="bi bi-collection-play-fill me-1 text-danger"></i> Ejercicios
+                    </a>
+                </li>
+
+                <!-- ======================================================= -->
+                <!-- 4. MENÚ DE USUARIO AUTENTICADO & LOGOUT                -->
+                <!-- ======================================================= -->
+                <li class="nav-item dropdown ms-lg-2" sec:authorize="isAuthenticated()">
+                    <a class="btn btn-sm btn-outline-light d-flex align-items-center gap-1 dropdown-toggle px-3 py-1 shadow-sm" href="#" role="button" data-bs-toggle="dropdown" style="border-radius: 20px;">
+                        <i class="bi bi-person-circle text-danger fs-6"></i>
+                        <span sec:authentication="name" class="fw-bold text-white small">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="border-radius: 12px;">
+                        <li class="px-3 py-2 bg-light border-bottom text-center">
+                            <div class="small text-muted">Sesión iniciada como:</div>
+                            <div class="fw-bold text-dark" sec:authentication="name">admin</div>
+                            <span class="badge bg-danger mt-1" sec:authentication="principal.authorities">ROL</span>
+                        </li>
+                        <li sec:authorize="hasAuthority('ROLE_ADMIN')">
+                            <a class="dropdown-item py-2 small" th:href="@{/usuarios}">
+                                <i class="bi bi-people-gear text-danger me-2"></i> Gestión de Cuentas / Usuarios
+                            </a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ROLE_ADMIN')">
+                            <a class="dropdown-item py-2 small" th:href="@{/reportes/backup-sql}">
+                                <i class="bi bi-database-down text-primary me-2"></i> Descargar Respaldo SQL
+                            </a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ROLE_CLIENTE')">
+                            <a class="dropdown-item py-2 small" th:href="@{/portal/mi-cuenta}">
+                                <i class="bi bi-person-badge text-danger me-2"></i> Mi Portal de Socio
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 small" href="#" data-bs-toggle="modal" data-bs-target="#modalCambiarPassword">
+                                <i class="bi bi-key-fill text-warning me-2"></i> Cambiar mi Contraseña
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" class="px-2 py-1">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="dropdown-item text-danger small fw-bold rounded-2">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+
+    <!-- Alertas Globales de Contraseña -->
+    <div class="container mt-2" th:if="${mensajePassword != null or errorPassword != null}">
+        <div th:if="${mensajePassword}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${mensajePassword}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorPassword}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorPassword}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+
+    <!-- Modal Global: Cambiar Contraseña de Perfil -->
+    <div class="modal fade" id="modalCambiarPassword" tabindex="-1" aria-labelledby="modalCambiarPasswordLabel" aria-hidden="true" sec:authorize="isAuthenticated()">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                <div class="modal-header bg-dark text-white p-3 border-bottom border-warning border-3" style="background-color: #111827 !important;">
+                    <h5 class="modal-title fw-bold" id="modalCambiarPasswordLabel">
+                        <i class="bi bi-shield-lock-fill text-warning me-2"></i> Cambiar mi Contraseña
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/usuarios/perfil/cambiar-password}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div class="modal-body p-4 bg-light">
+                        <div class="small text-muted mb-3">
+                            Actualiza la contraseña de tu cuenta de acceso a BRUTAL FITNESS de forma segura.
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-dark">Contraseña Actual:</label>
+                            <input type="password" name="actual" class="form-control" required placeholder="••••••••">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-dark">Nueva Contraseña:</label>
+                            <input type="password" name="nueva" class="form-control" required placeholder="Mínimo 4 caracteres" minlength="4">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-dark">Confirmar Nueva Contraseña:</label>
+                            <input type="password" name="confirmacion" class="form-control" required placeholder="Repite la nueva contraseña" minlength="4">
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-white border-top d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary btn-sm fw-bold px-3" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger btn-sm fw-bold px-4 shadow-sm">
+                            <i class="bi bi-check-circle-fill me-1"></i> Guardar Nueva Clave
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<footer th:fragment="footer" class="bg-dark text-white py-4 mt-auto border-top border-secondary" style="background-color: #111827 !important;">
+    <div class="container text-center">
+        <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+            <img th:src="@{/img/logo.png}" alt="BRUTAL FITNESS" class="rounded-2 shadow-sm bg-white p-1" style="height: 34px; width: auto;">
+            <div class="fw-bold text-white fs-5">
+                <span style="font-weight: 900;">BRUTAL</span> <span class="text-danger" style="font-weight: 900;">FITNESS</span>
+            </div>
+        </div>
+        <div class="text-danger fw-bold small text-uppercase mb-1" style="letter-spacing: 1px;">
+            « Transformando Cuerpo, Alma y Mente »
+        </div>
+        <div class="text-light small mb-1">
+            <i class="bi bi-geo-alt-fill text-danger me-1"></i> Jr. José Santos Chocano 980 — Las Nazarenas, Ayacucho
+            <span class="ms-3"><i class="bi bi-telephone-fill text-success me-1"></i> Informes: 917 683 165 / 963 712 503</span>
+        </div>
+        <div class="text-secondary small mt-2">
+            Sistema de Gestión Integral para Gimnasios &copy; 2026
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

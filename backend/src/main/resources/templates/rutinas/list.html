@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(titulo='Rutinas de Entrenamiento')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-0">
+                <i class="bi bi-journal-text text-danger me-2"></i> Rutinas y Planes de Entrenamiento
+            </h1>
+            <p class="text-secondary small mb-0">Prescripción de rutinas con animaciones en vivo de cada ejercicio y técnica</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/ejercicios}" class="btn btn-outline-danger fw-semibold">
+                <i class="bi bi-collection-play-fill me-1"></i> Biblioteca de GIFs
+            </a>
+            <a th:href="@{/rutinas/nuevo}" class="btn btn-danger fw-bold shadow-sm" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA', 'ROLE_ENTRENADOR')">
+                <i class="bi bi-plus-circle me-1"></i> + Asignar Rutina
+            </a>
+        </div>
+    </div>
+
+    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Lista de Rutinas -->
+    <div class="row g-4">
+        <div class="col-lg-6" th:each="r : ${rutinas}">
+            <div class="card h-100 shadow-sm border-0" style="border-radius: 14px; overflow: hidden; border-left: 5px solid #dc3545 !important;">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+                    <div>
+                        <span class="badge bg-danger text-uppercase px-2 py-1" th:text="${r.diaSemana}">Lunes - Pecho</span>
+                        <span class="badge bg-dark ms-1" th:text="${r.nivel}">Intermedio</span>
+                    </div>
+                    <div class="btn-group" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA', 'ROLE_ENTRENADOR')">
+                        <a th:href="@{/rutinas/editar/{id}(id=${r.id})}" class="btn btn-sm btn-outline-primary" title="Editar">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a th:href="@{/rutinas/eliminar/{id}(id=${r.id})}" class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('¿Está seguro de eliminar esta rutina?');" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <h2 class="h5 fw-bold text-dark mb-1" th:text="${r.nombre}">Hipertrofia Fase 1</h2>
+                    
+                    <div class="small text-muted mb-3">
+                        <span class="me-3"><i class="bi bi-person-fill text-danger"></i> Socio: <strong class="text-dark" th:text="${r.cliente.nombreCompleto}">Juan Perez</strong></span>
+                        <span th:if="${r.entrenador != null}"><i class="bi bi-person-badge text-primary"></i> Coach: <strong class="text-dark" th:text="${r.entrenador.nombreCompleto}">Marco Vargas</strong></span>
+                    </div>
+
+                    <!-- Galería de Ejercicios Vinculados con GIFs -->
+                    <div class="mb-3" th:if="${r.detalles != null and !#lists.isEmpty(r.detalles)}">
+                        <label class="small fw-bold text-muted text-uppercase mb-2 d-block">Ejercicios en Video:</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2 p-2 bg-light rounded-3 border" 
+                                 style="max-width: 260px;" 
+                                 th:each="d : ${r.detalles}">
+                                <img th:src="${d.ejercicio.gifUrl != null ? d.ejercicio.gifUrl : d.ejercicio.imagenUrl}" 
+                                     alt="" 
+                                     class="rounded bg-dark" 
+                                     style="width: 50px; height: 50px; object-fit: contain;">
+                                <div>
+                                    <strong class="small text-dark d-block text-truncate" style="max-width: 170px;" th:text="${d.ejercicio.nombre}">Press Smith</strong>
+                                    <span class="badge bg-danger" style="font-size: 0.65rem;" th:text="${d.ejercicio.grupoMuscular}">Pecho</span>
+                                    <span class="badge bg-dark" style="font-size: 0.65rem;" th:text="${d.series} + 'x' + ${d.repeticiones}">4x10</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Texto de Instrucciones -->
+                    <div class="bg-light p-3 rounded-3 small mb-2 text-dark font-monospace" style="white-space: pre-wrap;" th:text="${r.ejercicios}">
+                        1. Press de Banca: 4x10...
+                    </div>
+
+                    <div class="small text-muted mt-2" th:if="${r.observaciones != null and !r.observaciones.isEmpty()}">
+                        <i class="bi bi-info-circle text-danger me-1"></i> <span th:text="${r.observaciones}">Descanso 90s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12" th:if="${#lists.isEmpty(rutinas)}">
+            <div class="card shadow-sm border-0 p-5 text-center text-muted" style="border-radius: 12px;">
+                <i class="bi bi-journal-x fs-1 text-danger mb-2"></i>
+                <h3 class="h5 fw-bold text-dark">No hay rutinas registradas</h3>
+                <p class="small mb-0">Crea una nueva rutina para prescribir entrenamientos a los socios.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

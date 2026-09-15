@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(titulo='Registrar Pago')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h2>Registrar Pago</h2>
+
+    <form th:action="@{/pagos/guardar}" th:object="${pago}" method="post" class="row g-3">
+
+        <div class="col-md-6">
+            <label class="form-label">Cliente</label>
+            <select th:field="*{cliente}" class="form-select">
+                <option value="">-- Seleccione --</option>
+                <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nombreCompleto}"></option>
+            </select>
+            <div class="text-danger" th:if="${#fields.hasErrors('cliente')}" th:errors="*{cliente}"></div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Método de pago</label>
+            <select th:field="*{metodoPago}" class="form-select">
+                <option value="">-- Seleccione --</option>
+                <option th:each="m : ${metodos}" th:value="${m}" th:text="${m}"></option>
+            </select>
+            <div class="text-danger" th:if="${#fields.hasErrors('metodoPago')}" th:errors="*{metodoPago}"></div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Monto (S/)</label>
+            <input type="number" step="0.01" th:field="*{monto}" class="form-control">
+            <div class="text-danger" th:if="${#fields.hasErrors('monto')}" th:errors="*{monto}"></div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Fecha de pago</label>
+            <input type="date" th:field="*{fecha}" class="form-control">
+            <div class="text-danger" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Próxima fecha de pago</label>
+            <input type="date" th:field="*{proximaFechaPago}" class="form-control">
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a th:href="@{/pagos}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

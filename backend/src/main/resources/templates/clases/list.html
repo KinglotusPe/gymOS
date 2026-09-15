@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(titulo='Clases Grupales y Reservas')}"></head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mb-5">
+
+    <!-- Mensajes Flash -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${info}" class="alert alert-info alert-dismissible fade show shadow-sm border-0" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i> <span th:text="${info}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Header -->
+    <div class="card shadow-sm border-0 mb-4 p-4" style="background: #ffffff; border-radius: 12px; border-left: 5px solid #dc3545 !important;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 class="h3 fw-bold text-dark mb-1">
+                    <i class="bi bi-calendar-week-fill text-danger me-2"></i> Cronograma de Clases Grupales
+                </h1>
+                <p class="text-muted mb-0 small">
+                    Reserva tu cupo para Spinning, Crossfit, Boxeo y Yoga con aforo controlado en tiempo real.
+                </p>
+            </div>
+            <div class="d-flex gap-2" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA', 'ROLE_ENTRENADOR')">
+                <a th:href="@{/clases/nuevo}" class="btn btn-danger fw-bold shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Programar Nueva Clase
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Clases Programadas -->
+    <div class="row g-4">
+        <div class="col-lg-4 col-md-6" th:each="c : ${clases}">
+            <div class="card h-100 shadow-sm border-0" style="border-radius: 14px; overflow: hidden; border-top: 4px solid #dc3545 !important;">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <!-- Badge Disciplina e Intensidad -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-danger text-uppercase px-2 py-1" th:text="${c.disciplina.nombre}">Spinning</span>
+                            <span class="badge bg-dark" th:text="'Intensidad: ' + ${c.disciplina.intensidad}">Intensidad: Alta</span>
+                        </div>
+
+                        <!-- Titulo y Salon -->
+                        <h2 class="h5 fw-bold text-dark mb-1" th:text="${c.salon}">Sala 1 - Ciclismo</h2>
+                        
+                        <!-- Entrenador -->
+                        <div class="small text-muted mb-3">
+                            <i class="bi bi-person-check-fill text-danger me-1"></i> Instructor: <strong th:text="${c.entrenador.nombreCompleto}">Prof. Marco Vargas</strong>
+                        </div>
+
+                        <!-- Fecha y Horario -->
+                        <div class="bg-light p-3 rounded-3 mb-3 small">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted"><i class="bi bi-calendar-event me-1"></i> Fecha:</span>
+                                <strong class="text-dark" th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy')}">04/09/2026</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted"><i class="bi bi-clock me-1"></i> Horario:</span>
+                                <strong class="text-danger" th:text="${#temporals.format(c.horaInicio, 'HH:mm')} + ' - ' + ${#temporals.format(c.horaFin, 'HH:mm')}">07:00 - 08:00</strong>
+                            </div>
+                        </div>
+
+                        <!-- Barra de Aforo / Cupos -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small fw-bold mb-1">
+                                <span class="text-muted">Disponibilidad de Cupos:</span>
+                                <span th:classappend="${c.lleno ? 'text-danger' : 'text-success'}" 
+                                      th:text="${c.cuposDisponibles} + ' de ' + ${c.cupoMaximo} + ' libres'">
+                                    5 de 20 libres
+                                </span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" 
+                                     th:classappend="${c.lleno ? 'bg-danger' : (c.cuposDisponibles <= 3 ? 'bg-warning' : 'bg-success')}"
+                                     role="progressbar" 
+                                     th:style="'width: ' + (${c.cuposOcupados} * 100 / ${c.cupoMaximo}) + '%;'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div>
+                        <!-- Botón de Reserva para Socios -->
+                        <div sec:authorize="hasAuthority('ROLE_CLIENTE')">
+                            <form th:if="${!c.lleno}" th:action="@{/clases/{id}/reservar(id=${c.id})}" method="post">
+                                <button type="submit" class="btn btn-danger w-100 fw-bold shadow-sm">
+                                    <i class="bi bi-bookmark-check-fill me-1"></i> Reservar mi Cupo
+                                </button>
+                            </form>
+                            <button th:if="${c.lleno}" class="btn btn-secondary w-100 fw-bold" disabled>
+                                <i class="bi bi-x-circle me-1"></i> Cupos Agotados
+                            </button>
+                        </div>
+
+                        <!-- Acciones para Administrador / Staff -->
+                        <div sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_RECEPCIONISTA', 'ROLE_ENTRENADOR')" class="d-flex gap-2 mt-2">
+                            <form th:action="@{/clases/{id}/eliminar(id=${c.id})}" method="post" class="w-100" onsubmit="return confirm('¿Eliminar esta clase del cronograma?');">
+                                <button type="submit" class="btn btn-outline-danger btn-sm w-100 fw-semibold">
+                                    <i class="bi bi-trash me-1"></i> Cancelar Clase
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12" th:if="${#lists.isEmpty(clases)}">
+            <div class="card shadow-sm border-0 p-5 text-center text-muted" style="border-radius: 12px;">
+                <i class="bi bi-calendar-x fs-1 text-danger mb-2"></i>
+                <h3 class="h5 fw-bold text-dark">No hay clases grupales programadas para los próximos días</h3>
+                <p class="small mb-0">El staff publicará nuevos horarios de Spinning, Crossfit y Boxeo pronto.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
