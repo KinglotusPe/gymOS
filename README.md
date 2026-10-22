@@ -7,7 +7,6 @@
 <p align="center">
   <a href="https://github.com/KinglotusPe/gymOS/stargazers"><img src="https://img.shields.io/github/stars/KinglotusPe/gymOS?style=for-the-badge&logo=github&color=FF4500" alt="Stars"></a>
   <a href="https://github.com/KinglotusPe/gymOS/network/members"><img src="https://img.shields.io/github/forks/KinglotusPe/gymOS?style=for-the-badge&logo=github&color=333" alt="Forks"></a>
-  <a href="https://buymeacoffee.com/kinglotusp" target="_blank"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-Kinglotusp-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-00C853?style=for-the-badge" alt="License MIT"></a>
 </p>
 
@@ -551,20 +550,6 @@ Proyecto desarrollado para la carrera de **Ingeniería de Sistemas de Informaci�
 
 * **Gimnasio Beneficiario:** **BRUTAL FITNESS** (Jr. José Santos Chocano, Distrito de Jesús Nazareno, Ayacucho).
 * **Título del Proyecto:** *Sistema web de gestión para BRUTAL FITNESS: Gestión de clientes, membresías, pagos y asistencias*.
-
-## ☕ Apoya el Proyecto (Buy Me a Coffee)
-
-Si este proyecto te sirvió como base, te ahorró tiempo de desarrollo o te gustó su arquitectura:
-
-<div align="center">
-  <br>
-  <a href="https://buymeacoffee.com/kinglotusp" target="_blank">
-    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
-  </a>
-  <br><br>
-  <p>☕ Puedes apoyar al creador invitándole un café en: <a href="https://buymeacoffee.com/kinglotusp"><b>buymeacoffee.com/kinglotusp</b></a></p>
-  <p><i>¡Cada contribución ayuda a mantener el proyecto activo y seguir agregando módulos de código abierto para gimnasios! ⭐</i></p>
-</div>
 
 ---
 
