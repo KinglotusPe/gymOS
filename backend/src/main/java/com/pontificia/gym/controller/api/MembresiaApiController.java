@@ -2,13 +2,14 @@ package com.pontificia.gym.controller.api;
 
 import com.pontificia.gym.entity.Membresia;
 import com.pontificia.gym.service.MembresiaService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/membresias")
+@RequestMapping(value = "/api/membresias", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(origins = "*")
 public class MembresiaApiController {
 

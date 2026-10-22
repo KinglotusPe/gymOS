@@ -3,6 +3,7 @@ package com.pontificia.gym.controller.api;
 import com.pontificia.gym.entity.Ejercicio;
 import com.pontificia.gym.service.EjercicioService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/ejercicios")
+@RequestMapping(value = "/api/ejercicios", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(origins = "*")
 public class EjercicioApiController {
 

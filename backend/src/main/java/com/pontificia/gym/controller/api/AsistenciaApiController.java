@@ -10,6 +10,7 @@ import com.pontificia.gym.service.CasilleroService;
 import com.pontificia.gym.service.ClienteService;
 import com.pontificia.gym.service.EntrenadorService;
 import com.pontificia.gym.service.MembresiaService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/asistencias")
+@RequestMapping(value = "/api/asistencias", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(origins = "*")
 public class AsistenciaApiController {
 

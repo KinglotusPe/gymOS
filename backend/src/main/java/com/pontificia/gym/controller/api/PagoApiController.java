@@ -3,6 +3,7 @@ package com.pontificia.gym.controller.api;
 import com.pontificia.gym.entity.Pago;
 import com.pontificia.gym.service.PagoService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/pagos")
+@RequestMapping(value = "/api/pagos", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(origins = "*")
 public class PagoApiController {
 

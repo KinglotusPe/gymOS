@@ -2,6 +2,7 @@ package com.pontificia.gym.controller.api;
 
 import com.pontificia.gym.entity.Producto;
 import com.pontificia.gym.service.TiendaService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/tienda")
+@RequestMapping(value = "/api/tienda", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(origins = "*")
 public class TiendaApiController {
 
