@@ -48,7 +48,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/asistencias/escanear-dni", "/asistencias/escanear"))
             .authorizeHttpRequests(auth -> auth
                 // Recursos estáticos públicos
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/img/**", "/images/**", "/audio/**", "/favicon.ico", "/error").permitAll()
                 // Ruta de login
                 .requestMatchers("/login").permitAll()
                 // API REST y Reportes JasperReports públicos
