@@ -61,9 +61,10 @@ public class CasilleroApiController {
             existente.setNumero(datos.getNumero());
             existente.setPiso(datos.getPiso());
             existente.setEstado(datos.getEstado());
-            existente.setNombreOcupante(datos.getNombreOcupante());
-            existente.setDniOcupante(datos.getDniOcupante());
-            existente.setTipoOcupante(datos.getTipoOcupante());
+            existente.setUbicacion(datos.getUbicacion());
+            existente.setOcupadoPorNombre(datos.getOcupadoPorNombre());
+            existente.setOcupadoPorDni(datos.getOcupadoPorDni());
+            existente.setOcupadoPorTipo(datos.getOcupadoPorTipo());
             Casillero actualizado = casilleroService.guardar(existente);
             return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());

@@ -72,10 +72,10 @@ public class TiendaApiController {
         return tiendaService.buscarProductoPorId(id).map(existente -> {
             existente.setNombre(datos.getNombre());
             existente.setDescripcion(datos.getDescripcion());
-            existente.setPrecio(datos.getPrecio());
-            existente.setStock(datos.getStock());
-            existente.setImagenUrl(datos.getImagenUrl());
-            if (datos.getActivo() != null) existente.setActivo(datos.getActivo());
+            if (datos.getPrecioUnitario() != null) existente.setPrecioUnitario(datos.getPrecioUnitario());
+            if (datos.getStock() != null) existente.setStock(datos.getStock());
+            if (datos.getImagenUrl() != null) existente.setImagenUrl(datos.getImagenUrl());
+            if (datos.getCodigoBarra() != null) existente.setCodigoBarra(datos.getCodigoBarra());
             Producto actualizado = tiendaService.guardarProducto(existente);
             return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());

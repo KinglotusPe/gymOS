@@ -58,9 +58,8 @@ public class EntrenadorApiController {
             existente.setDni(datos.getDni());
             existente.setTelefono(datos.getTelefono());
             existente.setEspecialidad(datos.getEspecialidad());
-            existente.setEmail(datos.getEmail());
-            existente.setFotoUrl(datos.getFotoUrl());
-            if (datos.getActivo() != null) existente.setActivo(datos.getActivo());
+            existente.setCorreo(datos.getCorreo());
+            if (datos.getEstado() != null) existente.setEstado(datos.getEstado());
             Entrenador actualizado = entrenadorService.guardar(existente);
             return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());
