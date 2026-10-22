@@ -56,4 +56,38 @@ public class TiendaApiController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/productos")
+    public ResponseEntity<?> crearProducto(@RequestBody Producto producto) {
+        try {
+            Producto guardado = tiendaService.guardarProducto(producto);
+            return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(guardado);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/productos/{id}")
+    public ResponseEntity<?> actualizarProducto(@PathVariable Long id, @RequestBody Producto datos) {
+        return tiendaService.buscarProductoPorId(id).map(existente -> {
+            existente.setNombre(datos.getNombre());
+            existente.setDescripcion(datos.getDescripcion());
+            existente.setPrecio(datos.getPrecio());
+            existente.setStock(datos.getStock());
+            existente.setImagenUrl(datos.getImagenUrl());
+            if (datos.getActivo() != null) existente.setActivo(datos.getActivo());
+            Producto actualizado = tiendaService.guardarProducto(existente);
+            return ResponseEntity.ok(actualizado);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/productos/{id}")
+    public ResponseEntity<?> eliminarProducto(@PathVariable Long id) {
+        try {
+            tiendaService.eliminarProducto(id);
+            return ResponseEntity.ok(Map.of("mensaje", "Producto eliminado correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }
